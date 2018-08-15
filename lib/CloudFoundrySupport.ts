@@ -19,11 +19,11 @@ import {
 } from "@atomist/sdm";
 import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import {AddCloudFoundryManifest} from "./handlers/addCloudFoundryManifest";
+import {enableDeployOnCloudFoundryManifestAddition} from "./listeners/enableDeployOnCloudFoundryManifestAddition";
 import {
     SuggestAddingCloudFoundryManifest,
-    suggestAddingCloudFoundryManifestOnNewRepo
+    suggestAddingCloudFoundryManifestOnNewRepo,
 } from "./listeners/suggestAddingCloudFoundryManifest";
-import {enableDeployOnCloudFoundryManifestAddition} from "./listeners/enableDeployOnCloudFoundryManifestAddition";
 
 export const CloudFoundrySupport: ExtensionPack = {
     ...metadata("cloud-foundry"),

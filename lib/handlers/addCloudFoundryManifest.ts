@@ -15,15 +15,15 @@
  */
 
 import { logger } from "@atomist/automation-client";
+import {PullRequest} from "@atomist/automation-client/operations/edit/editModes";
 import {
     CodeTransform,
     CodeTransformRegistration, OnPullRequest,
 } from "@atomist/sdm";
 import { CloudFoundryManifestPath } from "@atomist/sdm-core";
+import {NodeProjectIdentifier} from "@atomist/sdm-pack-node/lib/build/nodeProjectIdentifier";
 import { MavenProjectIdentifier } from "@atomist/sdm-pack-spring";
 import { HasSpringBootPom } from "@atomist/sdm-pack-spring";
-import {NodeProjectIdentifier} from "@atomist/sdm-pack-node/lib/build/nodeProjectIdentifier";
-import {PullRequest} from "@atomist/automation-client/operations/edit/editModes";
 
 export const AddCloudFoundryManifestMarker = "[atomist:add-pcf-manifest]";
 

@@ -14,16 +14,16 @@
  * limitations under the License.
  */
 
-
 import {
     CommandListenerInvocation, PushImpactListener, PushImpactListenerRegistration,
-    SoftwareDeliveryMachine
+    SoftwareDeliveryMachine,
 } from "@atomist/sdm";
-import {AddCloudFoundryManifestMarker} from "../handlers/addCloudFoundryManifest";
-import {SetDeployEnablementParameters} from "@atomist/sdm-core/handlers/commands/SetDeployEnablement";
 import {setDeployEnablement} from "@atomist/sdm-core";
+import {SetDeployEnablementParameters} from "@atomist/sdm-core/handlers/commands/SetDeployEnablement";
+import {AddCloudFoundryManifestMarker} from "../handlers/addCloudFoundryManifest";
 
-export function enableDeployOnCloudFoundryManifestAdditionListener(sdm: SoftwareDeliveryMachine): PushImpactListener<any> {
+export function enableDeployOnCloudFoundryManifestAdditionListener(
+        sdm: SoftwareDeliveryMachine): PushImpactListener<any> {
     return async pil => {
         if (pil.push.commits.some(c => c.message.includes(AddCloudFoundryManifestMarker))) {
             const parameters: SetDeployEnablementParameters = {
@@ -46,7 +46,8 @@ export function enableDeployOnCloudFoundryManifestAdditionListener(sdm: Software
 /**
  * Enable deployment when a PCF manifest is added to the default branch.
  */
-export function enableDeployOnCloudFoundryManifestAddition(sdm: SoftwareDeliveryMachine): PushImpactListenerRegistration {
+export function enableDeployOnCloudFoundryManifestAddition(
+        sdm: SoftwareDeliveryMachine): PushImpactListenerRegistration {
     return {
         name: "EnableDeployOnCloudFoundryManifestAddition",
         action: enableDeployOnCloudFoundryManifestAdditionListener(sdm),

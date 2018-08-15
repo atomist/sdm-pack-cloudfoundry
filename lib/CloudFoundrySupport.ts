@@ -39,6 +39,6 @@ export const CloudFoundrySupport: ExtensionPack = {
             .addCodeTransformCommand(AddCloudFoundryManifest)
             .addChannelLinkListener(SuggestAddingCloudFoundryManifest)
             .addNewRepoWithCodeListener(suggestAddingCloudFoundryManifestOnNewRepo(sdm.configuration.sdm.projectLoader))
-            .addPushReaction(enableDeployOnCloudFoundryManifestAddition(sdm));
+            .addPushImpactListener(enableDeployOnCloudFoundryManifestAddition(sdm));
     },
 };

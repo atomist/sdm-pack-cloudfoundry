@@ -24,7 +24,7 @@
   "main": "./index.js",
   "types": "./index.d.ts",
   "dependencies": {
-    "@atomist/microgrammar": "^0.8.1",
+    "@atomist/microgrammar": "^0.9.1",
     "@atomist/slack-messages": "^0.12.1",
     "@types/lodash": "^4.14.116",
     "archiver": "^2.1.1",
@@ -44,11 +44,11 @@
     "@atomist/sdm-pack-spring": "*"
   },
   "devDependencies": {
-    "@atomist/automation-client": "^0.20.1",
-    "@atomist/sdm": "^0.4.1",
-    "@atomist/sdm-core": "^0.4.1",
+    "@atomist/automation-client": "^0.21.7",
+    "@atomist/sdm": "^0.4.7",
+    "@atomist/sdm-core": "^0.4.9",
     "@atomist/sdm-pack-node": "^0.2.1",
-    "@atomist/sdm-pack-spring": "^0.1.9",
+    "@atomist/sdm-pack-spring": "^0.1.10",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.5.7",
     "@types/power-assert": "^1.5.0",

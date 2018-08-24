@@ -15,8 +15,10 @@
  */
 
 import { configurationValue } from "@atomist/automation-client/configuration";
-import { Microgrammar } from "@atomist/microgrammar/Microgrammar";
-import { isPatternMatch } from "@atomist/microgrammar/PatternMatch";
+import {
+    isPatternMatch,
+    Microgrammar,
+} from "@atomist/microgrammar";
 
 /**
  * Use a microgrammar to parse the Cloud Foundry log to extract the endpoint

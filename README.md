@@ -1,6 +1,12 @@
 # @atomist/sdm-pack-cloudfoundry
 
-Extension pack for an Atomist SDM to deploy to Pivotal Cloud Foundry.
+[Atomist][atomist] software delivery machine (SDM) extension pack for an Atomist SDM to deploy to Pivotal Cloud Foundry.
+
+See the [Atomist documentation][atomist-doc] for more information on
+what SDMs are and what they can do for you using the Atomist API for
+software.
+
+[atomist-doc]: https://docs.atomist.com/ (Atomist Documentation)
 
 ## Usage
 
@@ -51,17 +57,29 @@ at [atomist-community.slack.com][slack].
 
 If you find a problem, please create an [issue][].
 
-[issue]: https://github.com/atomist/automation-client-ts/issues
+[issue]: https://github.com/atomist/sdm-pack-cloudfoundry/issues
+
 
 ## Development
 
-You will need to install [node][] to build and test this project.
+You will need to install [Node][node] to build and test this project.
 
-To run tests, define a GITHUB_TOKEN to any valid token that has repo access. The tests
-will create and delete repositories.
+[node]: https://nodejs.org/ (Node.js)
 
-Define GITHUB_VISIBILITY=public if you want these to be public; default is private.
-You'll get a 422 response from repo creation if you don't pay for private repos.
+### Build and test
+
+Use the following package scripts to build, test, and perform other
+development tasks.
+
+Command | Reason
+------- | ------
+`npm install` | install project dependencies
+`npm run build` | compile, test, lint, and generate docs
+`npm run lint` | run TSLint against the TypeScript
+`npm run compile` | generate types from GraphQL and compile TypeScript
+`npm test` | run tests
+`npm run autotest` | run tests every time a file changes
+`npm run clean` | remove files generated during build
 
 ### Build and Test
 
@@ -76,29 +94,15 @@ Command | Reason
 
 ### Release
 
-To create a new release of the project, update the version in
-package.json and then push a tag for the version.  The version must be
-of the form `M.N.P` where `M`, `N`, and `P` are integers that form the
-next appropriate [semantic version][semver] for release.  The version
-in the package.json must be the same as the tag.  For example:
+Releases are handled via the [Atomist SDM][atomist-sdm].  Just press
+the 'Approve' button in the Atomist dashboard or Slack.
 
-[semver]: http://semver.org
-
-```
-$ npm version 1.2.3
-$ git tag -a -m 'The ABC release' 1.2.3
-$ git push origin 1.2.3
-```
-
-The Travis CI build (see badge at the top of this page) will publish
-the NPM module and automatically create a GitHub release using the tag
-name for the release and the comment provided on the annotated tag as
-the contents of the release notes.
+[atomist-sdm]: https://github.com/atomist/atomist-sdm (Atomist Software Delivery Machine)
 
 ---
 
 Created by [Atomist][atomist].
-Need Help?  [Join our Slack team][slack].
+Need Help?  [Join our Slack workspace][slack].
 
-[atomist]: https://atomist.com/ (Atomist - Development Automation)
+[atomist]: https://atomist.com/ (Atomist - How Teams Deliver Software)
 [slack]: https://join.atomist.com/ (Atomist Community Slack)

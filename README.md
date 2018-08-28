@@ -3,7 +3,11 @@
 [![atomist sdm goals](http://badge.atomist.com/T29E48P34/atomist/sdm-pack-cloudfoundry/067b98ed-775a-4d34-a4a3-82837feca109)](https://app.atomist.com/workspace/T29E48P34)
 [![npm version](https://img.shields.io/npm/v/@atomist/sdm-pack-cloudfoundry/next.svg)](https://www.npmjs.com/package/@atomist/sdm-pack-cloudfoundry/v/next)
 
-[Atomist][atomist] software delivery machine (SDM) extension pack for an Atomist SDM to deploy to Pivotal Cloud Foundry.
+[Atomist][atomist] software delivery machine (SDM) extension pack for
+an Atomist SDM to deploy to [Cloud Foundry][cf].  These capabilities
+will work for both open source and Pivotal Cloud Foundry.
+
+[cf]: https://www.cloudfoundry.org/ (Cloud Foundry)
 
 See the [Atomist documentation][atomist-doc] for more information on
 what SDMs are and what they can do for you using the Atomist API for
@@ -13,22 +17,34 @@ software.
 
 ## Usage
 
-1. First install the dependency in your SDM project
+Install the dependency in your SDM project.
 
 ```
 $ npm install @atomist/sdm-pack-cloudfoundry
 ```
 
-2. Install the support
+Then use its exported method to add the functionality to your SDM in
+your machine definition.
 
-```
-sdm.addExtensionPacks(CloudFoundrySupport)
-```
+```typescript
+import {
+    SoftwareDeliveryMachine,
+    SoftwareDeliveryMachineConfiguration,
+} from "@atomist/sdm";
+import {
+    createSoftwareDeliveryMachine,
+} from "@atomist/sdm-core";
+import {
+    CloudFoundrySupport,
+} from "@atomist/sdm-pack-cloudfoundry";
 
-3. Add deployment rules using the Cloud Foundry deployers
-
-```
-sdm.addDeployRules(
+export function machine(configuration: SoftwareDeliveryMachineConfiguration): SoftwareDeliveryMachine {
+    const sdm = createSoftwareDeliveryMachine({
+        name: "My Software Delivery Machine",
+        configuration,
+    });
+    sdm.addExtensionPacks(SeedSupport);
+    sdm.addDeployRules(
         deploy.when(IsMaven)
             .deployTo(ProductionDeploymentGoal, ProductionEndpointGoal, ProductionUndeploymentGoal)
             .using({
@@ -36,18 +52,25 @@ sdm.addDeployRules(
                 targeter: () => new EnvironmentCloudFoundryTarget("production"),
             }),
     );
+    return sdm;
+};
 ```
 
-4. Add configuration to your client configuration
+Finally, add the required configuration values to your client
+configuration.
 
-```
-"cloudfoundry": {
-  "user": "jtreehorn@atomist.com",
-  "password": "1og7ammin",
-  "org": "atomist",
-  "spaces": {
-    "staging": "lj-staging",
-    "production": "lj-production"
+```json
+{
+  "sdm": {
+    "cloudfoundry": {
+      "user": "cf-user@atomist.com",
+      "password": "cFpAsSw0rD",
+      "org": "cf-organiation",
+      "spaces": {
+        "staging": "cf-staging-space",
+        "production": "cf-production-space"
+      }
+    }
   }
 }
 ```
@@ -55,45 +78,33 @@ sdm.addDeployRules(
 ## Support
 
 General support questions should be discussed in the `#support`
-channel on our community Slack team
-at [atomist-community.slack.com][slack].
+channel in the [Atomist community Slack workspace][slack].
 
 If you find a problem, please create an [issue][].
 
 [issue]: https://github.com/atomist/sdm-pack-cloudfoundry/issues
 
-
 ## Development
 
-You will need to install [Node][node] to build and test this project.
+You will need to install [Node.js][node] to build and test this
+project.
 
 [node]: https://nodejs.org/ (Node.js)
 
 ### Build and test
 
-Use the following package scripts to build, test, and perform other
-development tasks.
+Install dependencies.
 
-Command | Reason
-------- | ------
-`npm install` | install project dependencies
-`npm run build` | compile, test, lint, and generate docs
-`npm run lint` | run TSLint against the TypeScript
-`npm run compile` | generate types from GraphQL and compile TypeScript
-`npm test` | run tests
-`npm run autotest` | run tests every time a file changes
-`npm run clean` | remove files generated during build
+```
+$ npm install
+```
 
-### Build and Test
+Use the `build` package script to compile, test, lint, and build the
+documentation.
 
-Command | Reason
-------- | ------
-`npm install` | install all the required packages
-`npm run build` | lint, compile, and test
-`npm run lint` | run tslint against the TypeScript
-`npm run compile` | compile all TypeScript into JavaScript
-`npm test` | run tests and ensure everything is working
-`npm run clean` | remove stray compiled JavaScript files and build directory
+```
+$ npm run build
+```
 
 ### Release
 

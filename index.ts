@@ -14,6 +14,7 @@
  * limitations under the License.
  */
 
+export { CloudFoundrySupport } from "./lib/CloudFoundrySupport";
 export { CloudFoundryBlueGreenDeployer } from "./lib/push/CloudFoundryBlueGreenDeployer";
 export { CloudFoundryPushDeployer } from "./lib/push/CloudFoundryPushDeployer";
 export { CommandLineCloudFoundryDeployer } from "./lib/cli/CommandLineCloudFoundryDeployer";

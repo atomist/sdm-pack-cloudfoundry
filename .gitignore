@@ -10,7 +10,6 @@ node_modules/
 *.js.map
 *.log
 *.txt
-/build/
 /doc/
 /log/
 git-info.json

@@ -17,6 +17,9 @@
         ],
         "strict": false,
         "strictNullChecks": false,
+        "forceConsistentCasingInFileNames": true,
+        "noImplicitReturns": true,
+        "noUnusedLocals": true,
         "experimentalDecorators": true,
         "emitDecoratorMetadata": true
     },

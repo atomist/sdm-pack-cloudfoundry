@@ -15,10 +15,10 @@
  */
 
 import { logger } from "@atomist/automation-client";
-import {PullRequest} from "@atomist/automation-client/operations/edit/editModes";
+import { PullRequest } from "@atomist/automation-client/operations/edit/editModes";
 import {
     CodeTransform,
-    CodeTransformRegistration, OnPullRequest,
+    CodeTransformRegistration,
 } from "@atomist/sdm";
 import { NodeProjectIdentifier } from "@atomist/sdm-pack-node/lib/build/nodeProjectIdentifier";
 import { MavenProjectIdentifier } from "@atomist/sdm-pack-spring";

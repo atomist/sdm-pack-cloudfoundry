@@ -1,7 +1,7 @@
 # @atomist/sdm-pack-cloudfoundry
 
 [![atomist sdm goals](http://badge.atomist.com/T29E48P34/atomist/sdm-pack-cloudfoundry/067b98ed-775a-4d34-a4a3-82837feca109)](https://app.atomist.com/workspace/T29E48P34)
-[![npm version](https://img.shields.io/npm/v/@atomist/sdm-pack-cloudfoundry/next.svg)](https://www.npmjs.com/package/@atomist/sdm-pack-cloudfoundry/v/next)
+[![npm version](https://img.shields.io/npm/v/@atomist/sdm-pack-cloudfoundry.svg)](https://www.npmjs.com/package/@atomist/sdm-pack-cloudfoundry)
 
 [Atomist][atomist] software delivery machine (SDM) extension pack for
 an Atomist SDM to deploy to [Cloud Foundry][cf].  These capabilities

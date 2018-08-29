@@ -1,4 +1,4 @@
-# Change Log
+# Changelog
 
 All notable changes to this project will be documented in this file.
 
@@ -15,4 +15,4 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ### Added
 
--   Everything.
+-   SDM pack for Cloud Foundry.

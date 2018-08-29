@@ -2,7 +2,11 @@
   "name": "@atomist/sdm-pack-cloudfoundry",
   "version": "1.0.0",
   "description": "Atomist SDM extension pack for Cloud Foundry",
-  "author": "Atomist, Inc.",
+  "author": {
+    "name": "Atomist",
+    "email": "support@atomist.com",
+    "url": "https://atomist.com/"
+  },
   "license": "Apache-2.0",
   "homepage": "https://github.com/atomist/sdm-pack-cloudfoundry#readme",
   "repository": {

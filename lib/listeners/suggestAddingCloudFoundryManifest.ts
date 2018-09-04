@@ -29,8 +29,11 @@ import {
     HasSpringBootApplicationClass,
     IsMaven,
 } from "@atomist/sdm-pack-spring";
-import * as slack from "@atomist/slack-messages/SlackMessages";
-import { codeLine } from "@atomist/slack-messages/SlackMessages";
+import {
+    Attachment,
+    codeLine,
+    SlackMessage,
+} from "@atomist/slack-messages";
 import { AddCloudFoundryManifest } from "../handlers/addCloudFoundryManifest";
 
 /**
@@ -49,7 +52,7 @@ export const SuggestAddingCloudFoundryManifest: ChannelLinkListener = async inv 
         return;
     }
 
-    const attachment: slack.Attachment = {
+    const attachment: Attachment = {
         text: "Add a Cloud Foundry manifest to your new repo?",
         fallback: "add PCF manifest",
         actions: [buttonForCommand({text: "Add Cloud Foundry Manifest"},
@@ -58,7 +61,7 @@ export const SuggestAddingCloudFoundryManifest: ChannelLinkListener = async inv 
         ),
         ],
     };
-    const message: slack.SlackMessage = {
+    const message: SlackMessage = {
         attachments: [attachment],
     };
     return inv.addressNewlyLinkedChannel(message, { dashboard: false });
@@ -73,7 +76,7 @@ export function suggestAddingCloudFoundryManifestOnNewRepo(projectLoader: Projec
                     return;
                 }
 
-                const attachment: slack.Attachment = {
+                const attachment: Attachment = {
                     text: `Add a Cloud Foundry manifest to ${codeLine(`${inv.id.owner}/${inv.id.repo}`)}?`,
                     fallback: `Add a Cloud Foundry manifest to ${inv.id.owner}/${inv.id.repo}?`,
                     actions: [buttonForCommand({ text: "Add Cloud Foundry Manifest" },
@@ -82,7 +85,7 @@ export function suggestAddingCloudFoundryManifestOnNewRepo(projectLoader: Projec
                     ),
                     ],
                 };
-                const message: slack.SlackMessage = {
+                const message: SlackMessage = {
                     attachments: [attachment],
                 };
                 return inv.addressChannels(message);

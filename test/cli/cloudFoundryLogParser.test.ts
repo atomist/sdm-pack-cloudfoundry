@@ -17,10 +17,10 @@
 import {
     automationClientInstance,
     logger,
-    LoggingConfig,
 } from "@atomist/automation-client";
-LoggingConfig.format = "cli";
+
 (logger as any).level = process.env.LOG_LEVEL || "info";
+
 import * as assert from "power-assert";
 import { parseCloudFoundryLogForEndpoint } from "../../lib/cli/cloudFoundryLogParser";
 

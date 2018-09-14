@@ -14,11 +14,11 @@
  * limitations under the License.
  */
 
-import { fileExists } from "@atomist/automation-client/project/util/projectUtils";
+import { fileExists } from "@atomist/automation-client";
 import {
     predicatePushTest,
     PredicatePushTest,
-} from "@atomist/sdm/api/mapping/PushTest";
+} from "@atomist/sdm";
 import { CloudFoundryManifestPath } from "../api/CloudFoundryTarget";
 
 export const HasCloudFoundryManifest: PredicatePushTest = predicatePushTest(

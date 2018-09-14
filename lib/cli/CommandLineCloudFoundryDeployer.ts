@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { runCommand } from "@atomist/automation-client/action/cli/commandLine";
-import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { DelimitedWriteProgressLogDecorator } from "@atomist/sdm/api-helper/log/DelimitedWriteProgressLogDecorator";
 import {
     asSpawnCommand,
+    execIn,
+    logger,
+    ProjectOperationCredentials,
+    RemoteRepoRef,
     spawnAndWatch,
     SpawnCommand,
     stringifySpawnCommand,
-} from "@atomist/sdm/api-helper/misc/spawned";
-import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import { DeployableArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { Deployer } from "@atomist/sdm/spi/deploy/Deployer";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+} from "@atomist/automation-client";
+import {
+    DelimitedWriteProgressLogDecorator,
+    DeployableArtifact,
+    Deployer,
+    ExecuteGoalResult,
+    ProgressLog,
+    ProjectLoader,
+} from "@atomist/sdm";
 import { spawn } from "child_process";
 import {
     CloudFoundryDeployment,
@@ -62,15 +64,16 @@ export class CommandLineCloudFoundryDeployer implements Deployer<CloudFoundryInf
                 throw new Error("Cloud foundry authentication information missing. See CloudFoundryTarget.ts");
             }
 
-            const opts = {cwd: !!da.cwd ? da.cwd : project.baseDir};
+            const opts = {};
 
             // Note: if the password is wrong, things hangs forever waiting for input.
-            await runCommand(
-                `cf login -a ${cfi.api} -o ${cfi.org} -u ${cfi.username} -p '${cfi.password}' -s ${cfi.space}`,
-                opts);
+            await execIn(
+                !!da.cwd ? da.cwd : project.baseDir,
+                `cf login`,
+                [`-a ${cfi.api}`, `-o ${cfi.org}`, `-u ${cfi.username}`, `-p '${cfi.password}'`, `-s ${cfi.space}`]);
             logger.debug("Successfully selected space [%s]", cfi.space);
             // Turn off color so we don't have unpleasant escape codes in stream
-            await runCommand("cf config --color false", {cwd: da.cwd});
+            await execIn(da.cwd, `cf config`, ["--color false"]);
             const spawnCommand: SpawnCommand = {
                 command: "cf",
                 args: [

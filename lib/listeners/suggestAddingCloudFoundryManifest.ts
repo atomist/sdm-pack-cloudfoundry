@@ -14,8 +14,10 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { buttonForCommand } from "@atomist/automation-client/spi/message/MessageClient";
+import {
+    buttonForCommand,
+    logger,
+} from "@atomist/automation-client";
 import {
     allPredicatesSatisfied,
     anyPredicateSatisfied,

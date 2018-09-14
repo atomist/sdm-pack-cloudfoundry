@@ -21,10 +21,12 @@ import {
 import {
     CodeTransform,
     CodeTransformRegistration,
+} from "@atomist/sdm";
+import { NodeProjectIdentifier } from "@atomist/sdm-pack-node";
+import {
     HasSpringBootPom,
     MavenProjectIdentifier,
-    NodeProjectIdentifier,
-} from "@atomist/sdm";
+} from "@atomist/sdm-pack-spring";
 import { CloudFoundryManifestPath } from "../api/CloudFoundryTarget";
 
 export const AddCloudFoundryManifestMarker = "[atomist:add-pcf-manifest]";

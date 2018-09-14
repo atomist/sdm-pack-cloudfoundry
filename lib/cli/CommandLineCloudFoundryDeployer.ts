@@ -15,22 +15,22 @@
  */
 
 import {
+    asSpawnCommand,
+    execIn,
     logger,
     ProjectOperationCredentials,
     RemoteRepoRef,
-    runCommand,
+    spawnAndWatch,
+    SpawnCommand,
+    stringifySpawnCommand,
 } from "@atomist/automation-client";
 import {
-    asSpawnCommand,
     DelimitedWriteProgressLogDecorator,
     DeployableArtifact,
     Deployer,
     ExecuteGoalResult,
     ProgressLog,
     ProjectLoader,
-    spawnAndWatch,
-    SpawnCommand,
-    stringifySpawnCommand,
 } from "@atomist/sdm";
 import { spawn } from "child_process";
 import {
@@ -64,15 +64,16 @@ export class CommandLineCloudFoundryDeployer implements Deployer<CloudFoundryInf
                 throw new Error("Cloud foundry authentication information missing. See CloudFoundryTarget.ts");
             }
 
-            const opts = {cwd: !!da.cwd ? da.cwd : project.baseDir};
+            const opts = {};
 
             // Note: if the password is wrong, things hangs forever waiting for input.
-            await runCommand(
-                `cf login -a ${cfi.api} -o ${cfi.org} -u ${cfi.username} -p '${cfi.password}' -s ${cfi.space}`,
-                opts);
+            await execIn(
+                !!da.cwd ? da.cwd : project.baseDir,
+                `cf login`,
+                [`-a ${cfi.api}`, `-o ${cfi.org}`, `-u ${cfi.username}`, `-p '${cfi.password}'`, `-s ${cfi.space}`]);
             logger.debug("Successfully selected space [%s]", cfi.space);
             // Turn off color so we don't have unpleasant escape codes in stream
-            await runCommand("cf config --color false", {cwd: da.cwd});
+            await execIn(da.cwd, `cf config`, ["--color false"]);
             const spawnCommand: SpawnCommand = {
                 command: "cf",
                 args: [

@@ -14,15 +14,19 @@
  * limitations under the License.
  */
 
-import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
+import {
+    Project,
+    ProjectOperationCredentials,
+    RemoteRepoRef,
+} from "@atomist/automation-client";
 
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { Project } from "@atomist/automation-client/project/Project";
-import { DeployableArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { Deployer } from "@atomist/sdm/spi/deploy/Deployer";
-import { InterpretedLog } from "@atomist/sdm/spi/log/InterpretedLog";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+import {
+    DeployableArtifact,
+    Deployer,
+    InterpretedLog,
+    ProgressLog,
+    ProjectLoader,
+} from "@atomist/sdm";
 import * as yaml from "js-yaml";
 
 import * as _ from "lodash";

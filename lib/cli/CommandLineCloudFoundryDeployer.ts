@@ -14,22 +14,24 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { runCommand } from "@atomist/automation-client/action/cli/commandLine";
-import { ProjectOperationCredentials } from "@atomist/automation-client/operations/common/ProjectOperationCredentials";
-import { RemoteRepoRef } from "@atomist/automation-client/operations/common/RepoId";
-import { DelimitedWriteProgressLogDecorator } from "@atomist/sdm/api-helper/log/DelimitedWriteProgressLogDecorator";
+import {
+    logger,
+    ProjectOperationCredentials,
+    RemoteRepoRef,
+    runCommand,
+} from "@atomist/automation-client";
 import {
     asSpawnCommand,
+    DelimitedWriteProgressLogDecorator,
+    DeployableArtifact,
+    Deployer,
+    ExecuteGoalResult,
+    ProgressLog,
+    ProjectLoader,
     spawnAndWatch,
     SpawnCommand,
     stringifySpawnCommand,
-} from "@atomist/sdm/api-helper/misc/spawned";
-import { ExecuteGoalResult } from "@atomist/sdm/api/goal/ExecuteGoalResult";
-import { DeployableArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { Deployer } from "@atomist/sdm/spi/deploy/Deployer";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
-import { ProjectLoader } from "@atomist/sdm/spi/project/ProjectLoader";
+} from "@atomist/sdm";
 import { spawn } from "child_process";
 import {
     CloudFoundryDeployment,

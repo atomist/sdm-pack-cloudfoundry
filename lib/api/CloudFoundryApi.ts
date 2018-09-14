@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { doWithRetry } from "@atomist/automation-client/util/retry";
+import { doWithRetry } from "@atomist/automation-client";
 
 import axios, { AxiosResponse } from "axios";
 import cfClient = require("cf-client");

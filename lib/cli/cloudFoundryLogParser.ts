@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { configurationValue } from "@atomist/automation-client/configuration";
+import { configurationValue } from "@atomist/automation-client";
 import {
     isPatternMatch,
     Microgrammar,

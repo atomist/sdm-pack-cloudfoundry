@@ -15,11 +15,13 @@
  */
 
 import {
-    CommandListenerInvocation, PushImpactListener, PushImpactListenerRegistration,
+    CommandListenerInvocation,
+    PushImpactListener,
+    PushImpactListenerRegistration,
+    setDeployEnablement,
+    SetDeployEnablementParameters,
     SoftwareDeliveryMachine,
 } from "@atomist/sdm";
-import {setDeployEnablement} from "@atomist/sdm-core";
-import {SetDeployEnablementParameters} from "@atomist/sdm-core/handlers/commands/SetDeployEnablement";
 import {AddCloudFoundryManifestMarker} from "../handlers/addCloudFoundryManifest";
 
 export function enableDeployOnCloudFoundryManifestAdditionListener(

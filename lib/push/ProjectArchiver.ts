@@ -14,9 +14,11 @@
  * limitations under the License.
  */
 
-import { GitProject } from "@atomist/automation-client/project/git/GitProject";
-import { DeployableArtifact } from "@atomist/sdm/spi/artifact/ArtifactStore";
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+import { GitProject } from "@atomist/automation-client";
+import {
+    DeployableArtifact,
+    ProgressLog,
+} from "@atomist/sdm";
 import archiver = require("archiver");
 import * as fs from "fs";
 import { ReadStream } from "fs";

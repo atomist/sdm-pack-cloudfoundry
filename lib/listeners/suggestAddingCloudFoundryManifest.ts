@@ -14,21 +14,21 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { buttonForCommand } from "@atomist/automation-client/spi/message/MessageClient";
+import {
+    buttonForCommand,
+    logger,
+} from "@atomist/automation-client";
 import {
     allPredicatesSatisfied,
     anyPredicateSatisfied,
     ChannelLinkListener,
+    HasSpringBootApplicationClass,
+    IsMaven,
+    IsNode,
     ProjectLoader,
     ProjectPredicate,
     RepoListener,
 } from "@atomist/sdm";
-import { IsNode } from "@atomist/sdm-pack-node";
-import {
-    HasSpringBootApplicationClass,
-    IsMaven,
-} from "@atomist/sdm-pack-spring";
 import {
     Attachment,
     codeLine,

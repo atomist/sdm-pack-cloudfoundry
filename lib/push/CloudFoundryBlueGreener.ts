@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { ProgressLog } from "@atomist/sdm/spi/log/ProgressLog";
+import { ProgressLog } from "@atomist/sdm";
 import { ReadStream } from "fs";
 import * as _ from "lodash";
 import { CloudFoundryApi } from "../api/CloudFoundryApi";

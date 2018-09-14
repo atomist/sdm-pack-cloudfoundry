@@ -14,15 +14,17 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
-import { PullRequest } from "@atomist/automation-client/operations/edit/editModes";
+import {
+    logger,
+    PullRequest,
+} from "@atomist/automation-client";
 import {
     CodeTransform,
     CodeTransformRegistration,
+    HasSpringBootPom,
+    MavenProjectIdentifier,
+    NodeProjectIdentifier,
 } from "@atomist/sdm";
-import { NodeProjectIdentifier } from "@atomist/sdm-pack-node/lib/build/nodeProjectIdentifier";
-import { MavenProjectIdentifier } from "@atomist/sdm-pack-spring";
-import { HasSpringBootPom } from "@atomist/sdm-pack-spring";
 import { CloudFoundryManifestPath } from "../api/CloudFoundryTarget";
 
 export const AddCloudFoundryManifestMarker = "[atomist:add-pcf-manifest]";

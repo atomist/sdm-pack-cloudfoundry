@@ -16,8 +16,8 @@
 
 import {
     ExtensionPack,
+    metadata,
 } from "@atomist/sdm";
-import { metadata } from "@atomist/sdm/api-helper/misc/extensionPack";
 import {AddCloudFoundryManifest} from "./handlers/addCloudFoundryManifest";
 import {enableDeployOnCloudFoundryManifestAddition} from "./listeners/enableDeployOnCloudFoundryManifestAddition";
 import {

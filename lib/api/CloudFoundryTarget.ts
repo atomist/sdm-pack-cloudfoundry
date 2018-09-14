@@ -17,7 +17,7 @@
 import {
     Deployment,
     TargetInfo,
-} from "@atomist/sdm/spi/deploy/Deployment";
+} from "@atomist/sdm";
 
 /**
  * Path to Cloud Foundry manifest within deployable projects

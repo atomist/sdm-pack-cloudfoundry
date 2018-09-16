@@ -18,8 +18,8 @@ import {
     ExtensionPack,
     metadata,
 } from "@atomist/sdm";
-import {AddCloudFoundryManifest} from "./handlers/addCloudFoundryManifest";
-import {enableDeployOnCloudFoundryManifestAddition} from "./listeners/enableDeployOnCloudFoundryManifestAddition";
+import { AddCloudFoundryManifest } from "./handlers/addCloudFoundryManifest";
+import { enableDeployOnCloudFoundryManifestAddition } from "./listeners/enableDeployOnCloudFoundryManifestAddition";
 import {
     SuggestAddingCloudFoundryManifest,
     suggestAddingCloudFoundryManifestOnNewRepo,

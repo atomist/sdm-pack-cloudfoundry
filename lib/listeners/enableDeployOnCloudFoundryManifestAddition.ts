@@ -24,7 +24,7 @@ import {
     setDeployEnablement,
     SetDeployEnablementParameters,
 } from "@atomist/sdm-core/lib/handlers/commands/SetDeployEnablement";
-import {AddCloudFoundryManifestMarker} from "../handlers/addCloudFoundryManifest";
+import { AddCloudFoundryManifestMarker } from "../handlers/addCloudFoundryManifest";
 
 export function enableDeployOnCloudFoundryManifestAdditionListener(
         sdm: SoftwareDeliveryMachine): PushImpactListener<any> {

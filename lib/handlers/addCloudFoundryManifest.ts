@@ -40,7 +40,7 @@ export const AtomistConfigTsPath = "src/atomist.config.ts";
 export const addCloudFoundryManifestTransform: CodeTransform = async (p, ctx) => {
     const javaId = await MavenProjectIdentifier(p);
     if (javaId && await HasSpringBootPom.predicate(p)) {
-        return p.addFile(CloudFoundryManifestPath, javaManifestFor(javaId.name, ctx.context.workspaceId));
+        return p.addFile(CloudFoundryManifestPath, javaManifestFor(javaId.artifact, ctx.context.workspaceId));
     }
     const nodeId = await NodeProjectIdentifier(p);
     if (nodeId) {
@@ -65,7 +65,7 @@ export const AddCloudFoundryManifest: CodeTransformRegistration = {
     name: "AddCloudFoundryManifest",
     intent: "Add Cloud Foundry manifest",
     transformPresentation: () => new PullRequest(
-        `add-pcf-manifest-${new Date().getTime()}`,
+        `add-pcf-manifest-${Date.now()}`,
         "Add Cloud Foundry manifest",
         `This will trigger the Software Development Machine to deploy to your Cloud Foundry space.
 

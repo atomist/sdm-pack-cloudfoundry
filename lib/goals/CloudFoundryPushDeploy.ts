@@ -41,7 +41,7 @@ export interface CloudFoundryDeploymentRegistration extends Partial<Implementati
     environment: ("staging" | "production");
 }
 
-const CloudFoundryGoalDefition: GoalDefinition = {
+const CloudFoundryGoalDefinition: GoalDefinition = {
     uniqueName: "cloudfoundry-deploy",
     environment: IndependentOfEnvironment,
     workingDescription: "Deploying to CloudFoundry",
@@ -54,11 +54,11 @@ const CloudFoundryGoalDefition: GoalDefinition = {
  * Goal to deploy to CloudFoundry. This uses blue/green deployment.
  */
 export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFoundryDeploymentRegistration> {
-    constructor(private readonly details: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("cf-deploy-push"),
+    constructor(protected details: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("cf-deploy-push"),
                 ...dependsOn: Goal[]) {
 
         super({
-            ...CloudFoundryGoalDefition,
+            ...CloudFoundryGoalDefinition,
             ...getGoalDefintionFrom(details, DefaultGoalNameGenerator.generateName("cf-deploy-push")),
             displayName: "deploying to CloudFoundry",
         }, ...dependsOn);

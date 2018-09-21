@@ -31,14 +31,23 @@ import {
     logger,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import { CommandLineCloudFoundryDeployer } from "../cli/CommandLineCloudFoundryDeployer";
 import { EnvironmentCloudFoundryTarget } from "../config/EnvironmentCloudFoundryTarget";
 import { CloudFoundryBlueGreenDeployer } from "../push/CloudFoundryBlueGreenDeployer";
+import { CloudFoundryPushDeployer } from "../push/CloudFoundryPushDeployer";
 
 /**
  * Register a deployment for a certain type of push
  */
 export interface CloudFoundryDeploymentRegistration extends Partial<ImplementationRegistration> {
     environment: ("staging" | "production");
+    strategy: CloudFoundryDeploymentStrategy;
+}
+
+export enum CloudFoundryDeploymentStrategy {
+    BLUE_GREEN,
+    API,
+    CLI,
 }
 
 const CloudFoundryGoalDefinition: GoalDefinition = {
@@ -85,7 +94,21 @@ async function executeCloudFoundryDeployment(registration: CloudFoundryDeploymen
             configuration.sdm.artifactStore, id, credentials, progressLog);
 
         artifactCheckout.id.branch = sdmGoal.branch;
-        const deployments = await new CloudFoundryBlueGreenDeployer(configuration.sdm.projectLoader).deploy(
+
+        let deployer;
+        switch (registration.strategy) {
+            case CloudFoundryDeploymentStrategy.BLUE_GREEN:
+                deployer = new CloudFoundryBlueGreenDeployer(configuration.sdm.projectLoader);
+                break;
+            case CloudFoundryDeploymentStrategy.API:
+                deployer = new CloudFoundryPushDeployer(configuration.sdm.projectLoader);
+                break;
+            case CloudFoundryDeploymentStrategy.CLI:
+                deployer = new CommandLineCloudFoundryDeployer(configuration.sdm.projectLoader);
+                break;
+        }
+
+        const deployments = await deployer.deploy(
             artifactCheckout,
             new EnvironmentCloudFoundryTarget(registration.environment),
             progressLog,

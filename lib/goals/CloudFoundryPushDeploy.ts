@@ -54,7 +54,7 @@ const CloudFoundryGoalDefition: GoalDefinition = {
  * Goal to deploy to CloudFoundry. This uses blue/green deployment.
  */
 export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFoundryDeploymentRegistration> {
-    constructor(private readonly details: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("cf-deploy-push"),
+    constructor(protected details: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("cf-deploy-push"),
                 ...dependsOn: Goal[]) {
 
         super({

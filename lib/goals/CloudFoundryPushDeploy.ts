@@ -49,11 +49,11 @@ const CloudFoundryGoalDefition: GoalDefinition = {
     failedDescription: "Deployment to CloudFoundry failed",
 };
 
-// noinspection TsLint
 /**
  * Goal to deploy to CloudFoundry. This uses blue/green deployment.
  */
 export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFoundryDeploymentRegistration> {
+    // tslint:disable-next-line
     constructor(protected details: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("cf-deploy-push"),
                 ...dependsOn: Goal[]) {
 

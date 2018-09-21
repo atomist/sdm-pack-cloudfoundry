@@ -18,11 +18,12 @@ import { Success } from "@atomist/automation-client";
 import {
     checkOutArtifact,
     DefaultGoalNameGenerator,
+    Deployer,
     ExecuteGoal,
     ExecuteGoalResult,
     FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
-    getGoalDefintionFrom,
+    getGoalDefinitionFrom,
     Goal,
     GoalDefinition,
     GoalInvocation,
@@ -68,7 +69,7 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
 
         super({
             ...CloudFoundryGoalDefinition,
-            ...getGoalDefintionFrom(details, DefaultGoalNameGenerator.generateName("cf-deploy-push")),
+            ...getGoalDefinitionFrom(details, DefaultGoalNameGenerator.generateName("cf-deploy-push")),
             displayName: "deploying to CloudFoundry",
         }, ...dependsOn);
     }
@@ -95,7 +96,7 @@ async function executeCloudFoundryDeployment(registration: CloudFoundryDeploymen
 
         artifactCheckout.id.branch = sdmGoal.branch;
 
-        let deployer;
+        let deployer: Deployer;
         switch (registration.strategy) {
             case CloudFoundryDeploymentStrategy.BLUE_GREEN:
                 deployer = new CloudFoundryBlueGreenDeployer(configuration.sdm.projectLoader);

@@ -49,11 +49,11 @@ const CloudFoundryGoalDefinition: GoalDefinition = {
     failedDescription: "Deployment to CloudFoundry failed",
 };
 
-// noinspection TsLint
 /**
  * Goal to deploy to CloudFoundry. This uses blue/green deployment.
  */
 export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFoundryDeploymentRegistration> {
+    // tslint:disable-next-line
     constructor(protected details: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("cf-deploy-push"),
                 ...dependsOn: Goal[]) {
 
@@ -75,7 +75,6 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
 }
 
 async function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegistration): Promise<ExecuteGoal> {
-    // noinspection TsLint
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
         const {sdmGoal, credentials, id, context, progressLog, configuration} = goalInvocation;
         const atomistTeam = context.workspaceId;

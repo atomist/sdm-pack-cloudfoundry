@@ -21,3 +21,4 @@ export { CommandLineCloudFoundryDeployer } from "./lib/cli/CommandLineCloudFound
 export { CloudFoundryInfo } from "./lib/api/CloudFoundryTarget";
 export { EnvironmentCloudFoundryTarget } from "./lib/config/EnvironmentCloudFoundryTarget";
 export { HasCloudFoundryManifest } from "./lib/config/cloudFoundryManifestPushTest";
+export { CloudFoundryDeploy } from "./lib/goals/CloudFoundryPushDeploy";

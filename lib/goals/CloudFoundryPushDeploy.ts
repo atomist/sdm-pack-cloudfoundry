@@ -18,30 +18,40 @@ import { Success } from "@atomist/automation-client";
 import {
     checkOutArtifact,
     DefaultGoalNameGenerator,
+    Deployer,
     ExecuteGoal,
     ExecuteGoalResult,
     FulfillableGoalDetails,
     FulfillableGoalWithRegistrations,
-    getGoalDefintionFrom,
+    getGoalDefinitionFrom,
     Goal,
     GoalDefinition,
     GoalInvocation,
     ImplementationRegistration,
     IndependentOfEnvironment,
     logger,
-    Targeter,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import { CommandLineCloudFoundryDeployer } from "../cli/CommandLineCloudFoundryDeployer";
+import { EnvironmentCloudFoundryTarget } from "../config/EnvironmentCloudFoundryTarget";
 import { CloudFoundryBlueGreenDeployer } from "../push/CloudFoundryBlueGreenDeployer";
+import { CloudFoundryPushDeployer } from "../push/CloudFoundryPushDeployer";
 
 /**
  * Register a deployment for a certain type of push
  */
 export interface CloudFoundryDeploymentRegistration extends Partial<ImplementationRegistration> {
-    targeter: Targeter<any>;
+    environment: ("staging" | "production");
+    strategy: CloudFoundryDeploymentStrategy;
 }
 
-const CloudFoundryGoalDefition: GoalDefinition = {
+export enum CloudFoundryDeploymentStrategy {
+    BLUE_GREEN,
+    API,
+    CLI,
+}
+
+const CloudFoundryGoalDefinition: GoalDefinition = {
     uniqueName: "cloudfoundry-deploy",
     environment: IndependentOfEnvironment,
     workingDescription: "Deploying to CloudFoundry",
@@ -58,8 +68,8 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
                 ...dependsOn: Goal[]) {
 
         super({
-            ...CloudFoundryGoalDefition,
-            ...getGoalDefintionFrom(details, DefaultGoalNameGenerator.generateName("cf-deploy-push")),
+            ...CloudFoundryGoalDefinition,
+            ...getGoalDefinitionFrom(details, DefaultGoalNameGenerator.generateName("cf-deploy-push")),
             displayName: "deploying to CloudFoundry",
         }, ...dependsOn);
     }
@@ -79,15 +89,29 @@ async function executeCloudFoundryDeployment(registration: CloudFoundryDeploymen
         const {sdmGoal, credentials, id, context, progressLog, configuration} = goalInvocation;
         const atomistTeam = context.workspaceId;
 
-        logger.info("Deploying project %s:%s to CloudFoundry]", id.owner, id.repo);
+        logger.info("Deploying project %s:%s to CloudFoundry in %s]", id.owner, id.repo, registration.environment);
 
         const artifactCheckout = await checkOutArtifact(_.get(sdmGoal, "push.after.image.imageName"),
             configuration.sdm.artifactStore, id, credentials, progressLog);
 
         artifactCheckout.id.branch = sdmGoal.branch;
-        const deployments = await new CloudFoundryBlueGreenDeployer(configuration.sdm.projectLoader).deploy(
+
+        let deployer: Deployer;
+        switch (registration.strategy) {
+            case CloudFoundryDeploymentStrategy.BLUE_GREEN:
+                deployer = new CloudFoundryBlueGreenDeployer(configuration.sdm.projectLoader);
+                break;
+            case CloudFoundryDeploymentStrategy.API:
+                deployer = new CloudFoundryPushDeployer(configuration.sdm.projectLoader);
+                break;
+            case CloudFoundryDeploymentStrategy.CLI:
+                deployer = new CommandLineCloudFoundryDeployer(configuration.sdm.projectLoader);
+                break;
+        }
+
+        const deployments = await deployer.deploy(
             artifactCheckout,
-            registration.targeter(id, id.branch),
+            new EnvironmentCloudFoundryTarget(registration.environment),
             progressLog,
             credentials,
             atomistTeam);

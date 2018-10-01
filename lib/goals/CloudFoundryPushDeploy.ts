@@ -27,6 +27,7 @@ import {
     Goal,
     GoalDefinition,
     GoalInvocation,
+    Implementation,
     ImplementationRegistration,
     IndependentOfEnvironment,
     logger,
@@ -79,12 +80,12 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
             name: DefaultGoalNameGenerator.generateName("cf-deployer"),
             goalExecutor: executeCloudFoundryDeployment(registration),
             ...registration as ImplementationRegistration,
-        });
+        } as Implementation);
         return this;
     }
 }
 
-async function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegistration): Promise<ExecuteGoal> {
+function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegistration): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
         const {sdmGoal, credentials, id, context, progressLog, configuration} = goalInvocation;
         const atomistTeam = context.workspaceId;

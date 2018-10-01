@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.0-M.5...HEAD)
 
+### Added
+
+-   Fix typed goal deployment. [#16](https://github.com/atomist/sdm-pack-cloudfoundry/issues/16)
+
 ## [1.0.0-M.5](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.0...1.0.0-M.5) - 2018-09-26
 
 ## [1.0.0](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.0-M.4...1.0.0) - 2018-09-26

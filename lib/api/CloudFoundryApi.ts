@@ -17,13 +17,13 @@
 import { doWithRetry } from "@atomist/automation-client";
 
 import axios, { AxiosResponse } from "axios";
-import { ReadStream } from "fs";
-import * as _ from "lodash";
-import { ManifestApplication } from "./CloudFoundryManifest";
-import { CloudFoundryInfo } from "./CloudFoundryTarget";
 import cfClient = require("cf-client");
 import FormData = require("form-data");
+import { ReadStream } from "fs";
+import * as _ from "lodash";
 import request = require("request");
+import { ManifestApplication } from "./CloudFoundryManifest";
+import { CloudFoundryInfo } from "./CloudFoundryTarget";
 
 export interface CloudFoundryClientV2 {
     api_url: string;
@@ -370,7 +370,7 @@ export class CloudFoundryApi {
                         name: orgName,
                     },
                 },
-                headers: _.assign({}, this.authHeader, this.jsonContentHeader)
+                headers: _.assign({}, this.authHeader, this.jsonContentHeader),
             },
         ), `get organisation with name ${orgName}`);
         const orgs = response.data;

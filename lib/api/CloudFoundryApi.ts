@@ -31,7 +31,6 @@ export interface CloudFoundryClientV2 {
     usersUaa: any;
     apps: any;
     domains: any;
-    organisations: any;
     spaces: any;
     serviceBindings: any;
     userProvidedServices: any;
@@ -49,7 +48,6 @@ export async function initializeCloudFoundry(cfi: CloudFoundryInfo): Promise<Clo
         api_url: cfi.api,
         token,
         usersUaa,
-        organisations: new cfClient.Organisations(cfi.api),
         apps: new cfClient.Apps(cfi.api),
         domains: new cfClient.Domains(cfi.api),
         spaces: new cfClient.Spaces(cfi.api),
@@ -83,7 +81,6 @@ export class CloudFoundryApi {
         };
         this.cf.usersUaa.setToken(newToken);
         this.cf.apps.setToken(newToken);
-        this.cf.organisations.setToken(newToken);
         this.cf.domains.setToken(newToken);
         this.cf.spaces.setToken(newToken);
         this.cf.serviceBindings.setToken(newToken);

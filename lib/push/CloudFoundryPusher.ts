@@ -38,6 +38,7 @@ export class CloudFoundryPusher {
     private spaceGuid: string;
 
     constructor(private readonly api: CloudFoundryApi,
+                public readonly organisationName: string,
                 public readonly spaceName: string,
                 public readonly defaultDomain: string = "cfapps.io") {
 
@@ -45,7 +46,8 @@ export class CloudFoundryPusher {
 
     public async getSpaceGuid(): Promise<string> {
         if (!this.spaceGuid) {
-            const space = await this.api.getSpaceByName(this.spaceName);
+            const organisationGuid = await this.api.getOrganisationGuidByName(this.organisationName);
+            const space = await this.api.getSpaceByName(organisationGuid, this.spaceName);
             this.spaceGuid = space.metadata.guid;
         }
         return this.spaceGuid;

@@ -74,7 +74,7 @@ export class CloudFoundryPushDeployer implements Deployer<CloudFoundryInfo, Clou
             const manifest = await this.getManifest(project);
             const cfClient = await initializeCloudFoundry(cfi);
             const cfApi = new CloudFoundryApi(cfClient);
-            const pusher = new CloudFoundryPusher(cfApi, cfi.space);
+            const pusher = new CloudFoundryPusher(cfApi, cfi.org, cfi.space);
             const deploymentPromises = manifest.applications.map(manifestApp => {
                 manifestApp["random-route"] = true; // always use a random route for now to match previous behavior
                 return pusher.push(manifestApp, packageFile, log);
@@ -93,7 +93,7 @@ export class CloudFoundryPushDeployer implements Deployer<CloudFoundryInfo, Clou
             const manifest = await this.getManifest(project);
             const cfClient = await initializeCloudFoundry(cfi);
             const cfApi = new CloudFoundryApi(cfClient);
-            const pusher = new CloudFoundryPusher(cfApi, cfi.space);
+            const pusher = new CloudFoundryPusher(cfApi, cfi.org, cfi.space);
             const spaceGuid = await pusher.getSpaceGuid();
             const apps = manifest.applications.map(async manifestApp => {
                 const app = await cfApi.getApp(spaceGuid, manifestApp.name);
@@ -121,7 +121,8 @@ export class CloudFoundryPushDeployer implements Deployer<CloudFoundryInfo, Clou
         }
         const cfClient = await initializeCloudFoundry(cfi);
         const cfApi = new CloudFoundryApi(cfClient);
-        const space = await cfApi.getSpaceByName(cfi.space);
+        const organisationGuid = await cfApi.getOrganisationGuidByName(cfi.org);
+        const space = await cfApi.getSpaceByName(organisationGuid, cfi.space);
         const spaceGuid = space.metadata.guid;
         const app = await cfApi.getApp(spaceGuid, deployment.appName);
         if (app) {

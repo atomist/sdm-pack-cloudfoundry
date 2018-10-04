@@ -78,7 +78,7 @@ export class CloudFoundryBlueGreenDeployer implements Deployer<CloudFoundryInfo,
             const manifest = await this.getManifest(project);
             const cfClient = await initializeCloudFoundry(cfi);
             const cfApi = new CloudFoundryApi(cfClient);
-            const pusher = new CloudFoundryPusher(cfApi, cfi.space);
+            const pusher = new CloudFoundryPusher(cfApi, cfi.org, cfi.space);
             const deployments: Array<Promise<CloudFoundryDeployment>> = manifest.applications.map(async manifestApp => {
                 const namer = new BlueGreenNamer(manifestApp.name);
                 const bger = new CloudFoundryBlueGreener(cfApi, pusher, namer, log);
@@ -113,7 +113,7 @@ export class CloudFoundryBlueGreenDeployer implements Deployer<CloudFoundryInfo,
             const manifest = await this.getManifest(project);
             const cfClient = await initializeCloudFoundry(cfi);
             const cfApi = new CloudFoundryApi(cfClient);
-            const pusher = new CloudFoundryPusher(cfApi, cfi.space);
+            const pusher = new CloudFoundryPusher(cfApi, cfi.org, cfi.space);
             const spaceGuid = await pusher.getSpaceGuid();
             const appNames = manifest.applications.map( manifestApp => {
                 const namer = new BlueGreenNamer(manifestApp.name);
@@ -143,7 +143,8 @@ export class CloudFoundryBlueGreenDeployer implements Deployer<CloudFoundryInfo,
         }
         const cfClient = await initializeCloudFoundry(cfi);
         const cfApi = new CloudFoundryApi(cfClient);
-        const space = await cfApi.getSpaceByName(cfi.space);
+        const organisationGuid = await cfApi.getOrganisationGuidByName(cfi.org);
+        const space = await cfApi.getSpaceByName(organisationGuid, cfi.space);
         const spaceGuid = space.metadata.guid;
         const app = await cfApi.getApp(spaceGuid, deployment.appName);
         if (app) {

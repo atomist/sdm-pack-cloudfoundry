@@ -363,9 +363,7 @@ export class CloudFoundryApi {
             `${this.cf.api_url}/v2/organizations`,
             {
                 params: {
-                    q: {
-                        name: orgName,
-                    },
+                    q: `name:${orgName}`,
                 },
                 headers: _.assign({}, this.authHeader, this.jsonContentHeader),
             },

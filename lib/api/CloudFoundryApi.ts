@@ -69,7 +69,7 @@ export async function initializeCloudFoundry(cfi: CloudFoundryInfo): Promise<Clo
 export class CloudFoundryApi {
 
     private authHeader;
-    private readonly httpClient: HttpClient;
+    private httpClient: HttpClient;
     private readonly jsonContentHeader = {
         "Content-Type": "application/json",
     };
@@ -359,10 +359,13 @@ export class CloudFoundryApi {
 
     public async getSpaceByName(organisationGuid: string, spaceName: string): Promise<any> {
         await this.refreshToken();
-        const response = await this.httpClient.exchange(`${this.cf.api_url}/v2/spaces?q=organization_guid:${organisationGuid}`, {
+        const response = await this.httpClient.exchange(
+            `${this.cf.api_url}/v2/spaces?q=organization_guid:${organisationGuid}`,
+            {
             method: HttpMethod.Get,
             headers: _.assign({}, this.authHeader, this.jsonContentHeader),
-        });
+            },
+        );
         const responseData = response.body as any;
         if (responseData.total_results > 0) {
             const spaces = responseData.resources as any[];

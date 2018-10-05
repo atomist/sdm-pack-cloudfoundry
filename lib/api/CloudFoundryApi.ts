@@ -364,7 +364,7 @@ export class CloudFoundryApi {
         ), `get spaces with organization_guid ${organisationGuid}`);
         const responseData = response.data;
         if (responseData.total_results > 0) {
-            const spaces = responseData.resources as any[]
+            const spaces = responseData.resources as any[];
             return _.head(spaces.filter(value => value.entity.name === spaceName));
         } else {
             return undefined;

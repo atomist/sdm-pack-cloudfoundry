@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import { doWithRetry } from "@atomist/automation-client";
-
+import {
+    DefaultHttpClientFactory,
+    doWithRetry,
+    HttpClient,
+    HttpMethod,
+} from "@atomist/automation-client";
 import axios, { AxiosResponse } from "axios";
 import cfClient = require("cf-client");
 import FormData = require("form-data");
@@ -65,12 +69,14 @@ export async function initializeCloudFoundry(cfi: CloudFoundryInfo): Promise<Clo
 export class CloudFoundryApi {
 
     private authHeader;
+    private httpClient: HttpClient;
     private readonly jsonContentHeader = {
         "Content-Type": "application/json",
     };
 
     constructor(private readonly cf: CloudFoundryClientV2,
                 private readonly retryInterval: number = 1000) {
+        this.httpClient = DefaultHttpClientFactory.create(`${cf.api_url}`);
     }
 
     private async refreshToken() {
@@ -353,16 +359,11 @@ export class CloudFoundryApi {
 
     public async getSpaceByName(organisationGuid: string, spaceName: string): Promise<any> {
         await this.refreshToken();
-        const response = await doWithRetry(() => axios.get(
-            `${this.cf.api_url}/v2/spaces`,
-            {
-                params: {
-                    q: `organization_guid:${organisationGuid}`,
-                },
-                headers: _.assign({}, this.authHeader, this.jsonContentHeader),
-            },
-        ), `get spaces with organization_guid ${organisationGuid}`);
-        const responseData = response.data;
+        const response = await this.httpClient.exchange(`/v2/spaces?q=organization_guid:${organisationGuid}`, {
+            method: HttpMethod.Get,
+            headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+        });
+        const responseData = response.body as any;
         if (responseData.total_results > 0) {
             const spaces = responseData.resources as any[];
             return _.head(spaces.filter(value => value.entity.name === spaceName));
@@ -373,16 +374,11 @@ export class CloudFoundryApi {
 
     public async getOrganisationGuidByName(orgName: string): Promise<any> {
         await this.refreshToken();
-        const response = await doWithRetry(() => axios.get(
-            `${this.cf.api_url}/v2/organizations`,
-            {
-                params: {
-                    q: `name:${orgName}`,
-                },
-                headers: _.assign({}, this.authHeader, this.jsonContentHeader),
-            },
-        ), `get organisation with name ${orgName}`);
-        const orgs = response.data;
+        const response = await this.httpClient.exchange(`/v2/organizations?q=name:${orgName}`, {
+            method: HttpMethod.Get,
+            headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+        });
+        const orgs = response.body as any;
         if (orgs.total_results === 1) {
             return orgs.resources[0].metadata.guid;
         } else {

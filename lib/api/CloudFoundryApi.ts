@@ -360,7 +360,7 @@ export class CloudFoundryApi {
     public async getOrganisationGuidByName(orgName: string): Promise<any> {
         await this.refreshToken();
         const response = await doWithRetry(() => axios.get(
-            `${this.cf.api_url}/v2/organisations`,
+            `${this.cf.api_url}/v2/organizations`,
             {
                 params: {
                     q: {

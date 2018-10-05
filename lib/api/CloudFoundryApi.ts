@@ -359,7 +359,7 @@ export class CloudFoundryApi {
 
     public async getSpaceByName(organisationGuid: string, spaceName: string): Promise<any> {
         await this.refreshToken();
-        const response = await this.httpClient.exchange(`/v2/spaces?q=organization_guid:${organisationGuid}`, {
+        const response = await this.httpClient.exchange(`${this.cf.api_url}/v2/spaces?q=organization_guid:${organisationGuid}`, {
             method: HttpMethod.Get,
             headers: _.assign({}, this.authHeader, this.jsonContentHeader),
         });
@@ -374,7 +374,7 @@ export class CloudFoundryApi {
 
     public async getOrganisationGuidByName(orgName: string): Promise<any> {
         await this.refreshToken();
-        const response = await this.httpClient.exchange(`/v2/organizations?q=name:${orgName}`, {
+        const response = await this.httpClient.exchange(`${this.cf.api_url}/v2/organizations?q=name:${orgName}`, {
             method: HttpMethod.Get,
             headers: _.assign({}, this.authHeader, this.jsonContentHeader),
         });

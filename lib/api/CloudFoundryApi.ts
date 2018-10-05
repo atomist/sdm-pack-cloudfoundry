@@ -69,7 +69,7 @@ export async function initializeCloudFoundry(cfi: CloudFoundryInfo): Promise<Clo
 export class CloudFoundryApi {
 
     private authHeader;
-    private httpClient: HttpClient;
+    private readonly httpClient: HttpClient;
     private readonly jsonContentHeader = {
         "Content-Type": "application/json",
     };

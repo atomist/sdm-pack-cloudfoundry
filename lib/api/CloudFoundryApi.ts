@@ -353,7 +353,7 @@ export class CloudFoundryApi {
 
     public async getSpaceByName(organisationGuid: string, spaceName: string): Promise<any> {
         await this.refreshToken();
-        const spaces = await this.cf.spaces.getSpaces({q: `organisation_guid:${organisationGuid}`}).resources as any[];
+        const spaces = await this.cf.spaces.getSpaces({q: `organization_guid:${organisationGuid}`}).resources as any[];
         return _.head(spaces.filter(value => value.entity.name === spaceName));
     }
 

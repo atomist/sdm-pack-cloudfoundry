@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-import { fileExists } from "@atomist/automation-client";
+import { projectUtils } from "@atomist/automation-client";
 import {
     predicatePushTest,
     PredicatePushTest,
@@ -23,4 +23,4 @@ import { CloudFoundryManifestPath } from "../api/CloudFoundryTarget";
 
 export const HasCloudFoundryManifest: PredicatePushTest = predicatePushTest(
     "Has PCF manifest",
-    async p => fileExists(p, CloudFoundryManifestPath, f => true));
+    async p => projectUtils.fileExists(p, CloudFoundryManifestPath, f => true));

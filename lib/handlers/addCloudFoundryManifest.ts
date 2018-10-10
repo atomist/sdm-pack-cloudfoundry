@@ -16,7 +16,7 @@
 
 import {
     logger,
-    PullRequest,
+    editModes,
 } from "@atomist/automation-client";
 import {
     CodeTransform,
@@ -64,7 +64,7 @@ export const AddCloudFoundryManifest: CodeTransformRegistration = {
     transform: addCloudFoundryManifestTransform,
     name: "AddCloudFoundryManifest",
     intent: "Add Cloud Foundry manifest",
-    transformPresentation: () => new PullRequest(
+    transformPresentation: () => new editModes.PullRequest(
         `add-pcf-manifest-${Date.now()}`,
         "Add Cloud Foundry manifest",
         `This will trigger the Software Development Machine to deploy to your Cloud Foundry space.

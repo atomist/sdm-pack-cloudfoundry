@@ -14,7 +14,10 @@
  * limitations under the License.
  */
 
-import { Success } from "@atomist/automation-client";
+import {
+    logger,
+    Success,
+} from "@atomist/automation-client";
 import {
     checkOutArtifact,
     DefaultGoalNameGenerator,
@@ -30,7 +33,6 @@ import {
     Implementation,
     ImplementationRegistration,
     IndependentOfEnvironment,
-    logger,
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { CommandLineCloudFoundryDeployer } from "../cli/CommandLineCloudFoundryDeployer";

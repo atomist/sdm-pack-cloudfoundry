@@ -57,13 +57,13 @@ export enum CloudFoundryDeploymentStrategy {
 const CloudFoundryGoalDefinition: GoalDefinition = {
     uniqueName: "cloudfoundry-deploy",
     environment: IndependentOfEnvironment,
-    workingDescription: "Deploying to CloudFoundry",
-    completedDescription: "Deployed to CloudFoundry",
-    failedDescription: "Deployment to CloudFoundry failed",
+    workingDescription: "Deploying to Cloud Foundry",
+    completedDescription: "Deployed to Cloud Foundry",
+    failedDescription: "Deployment to Cloud Foundry failed",
 };
 
 /**
- * Goal to deploy to CloudFoundry. This uses blue/green deployment.
+ * Goal to deploy to Cloud Foundry. This uses blue/green deployment.
  */
 export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFoundryDeploymentRegistration> {
     // tslint:disable-next-line

@@ -15,8 +15,8 @@
  */
 
 import {
-    logger,
     editModes,
+    logger,
 } from "@atomist/automation-client";
 import {
     CodeTransform,

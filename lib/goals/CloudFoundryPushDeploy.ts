@@ -16,7 +16,6 @@
 
 import {
     logger,
-    Success,
 } from "@atomist/automation-client";
 import {
     checkOutArtifact,
@@ -61,6 +60,10 @@ const CloudFoundryGoalDefinition: GoalDefinition = {
     workingDescription: "Deploying to Cloud Foundry",
     completedDescription: "Deployed to Cloud Foundry",
     failedDescription: "Deployment to Cloud Foundry failed",
+    waitingForApprovalDescription: "Waiting for Cloud Foundry deployment approval",
+    waitingForPreApprovalDescription: "Waiting to start Cloud Foundry deployment",
+    stoppedDescription: "Deployment to Cloud Foundry stopped",
+    canceledDescription: "Deployment to Cloud Foundry cancelled",
 };
 
 /**
@@ -119,13 +122,13 @@ function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegis
             credentials,
             atomistTeam);
 
-        await Promise.all(deployments.map(deployment => {
+        const results = await Promise.all(deployments.map(deployment => {
             return {
                 code: 0,
-                phase: deployment.endpoint,
+                targetUrl: deployment.endpoint,
             } as ExecuteGoalResult;
         }));
 
-        return Success;
+        return _.head(results);
     };
 }

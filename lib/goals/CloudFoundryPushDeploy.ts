@@ -55,6 +55,7 @@ export enum CloudFoundryDeploymentStrategy {
 }
 
 const CloudFoundryGoalDefinition: GoalDefinition = {
+    displayName: "deploying to Cloud Foundry",
     uniqueName: "cloudfoundry-deploy",
     environment: IndependentOfEnvironment,
     workingDescription: "Deploying to Cloud Foundry",
@@ -73,7 +74,6 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
         super({
             ...CloudFoundryGoalDefinition,
             ...getGoalDefinitionFrom(details, DefaultGoalNameGenerator.generateName("cf-deploy-push")),
-            displayName: "deploying to CloudFoundry",
         }, ...dependsOn);
     }
 

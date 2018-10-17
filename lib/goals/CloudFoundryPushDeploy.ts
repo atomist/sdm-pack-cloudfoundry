@@ -16,7 +16,6 @@
 
 import {
     logger,
-    Success,
 } from "@atomist/automation-client";
 import {
     checkOutArtifact,
@@ -119,13 +118,13 @@ function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegis
             credentials,
             atomistTeam);
 
-        await Promise.all(deployments.map(deployment => {
+        const results = await Promise.all(deployments.map(deployment => {
             return {
                 code: 0,
                 targetUrl: deployment.endpoint,
             } as ExecuteGoalResult;
         }));
 
-        return Success;
+        return _.head(results);
     };
 }

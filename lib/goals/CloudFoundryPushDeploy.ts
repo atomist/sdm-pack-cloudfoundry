@@ -59,6 +59,10 @@ const CloudFoundryGoalDefinition: GoalDefinition = {
     workingDescription: "Deploying to Cloud Foundry",
     completedDescription: "Deployed to Cloud Foundry",
     failedDescription: "Deployment to Cloud Foundry failed",
+    waitingForApprovalDescription: "Waiting for Cloud Foundry deployment approval",
+    waitingForPreApprovalDescription: "Waiting to start Cloud Foundry deployment",
+    stoppedDescription: "Deployment to Cloud Foundry stopped",
+    canceledDescription: "Deployment to Cloud Foundry cancelled",
 };
 
 /**

@@ -122,7 +122,7 @@ function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegis
         await Promise.all(deployments.map(deployment => {
             return {
                 code: 0,
-                phase: deployment.endpoint,
+                targetUrl: deployment.endpoint,
             } as ExecuteGoalResult;
         }));
 

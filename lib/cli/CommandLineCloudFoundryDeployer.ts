@@ -28,7 +28,6 @@ import {
     DelimitedWriteProgressLogDecorator,
     DeployableArtifact,
     Deployer,
-    ExecuteGoalResult,
     ProgressLog,
     ProjectLoader,
 } from "@atomist/sdm";
@@ -121,12 +120,13 @@ export class CommandLineCloudFoundryDeployer implements Deployer<CloudFoundryInf
     public async undeploy(
             cfi: CloudFoundryInfo,
             deployment: CloudFoundryDeployment,
-            log: ProgressLog): Promise<ExecuteGoalResult> {
+            log: ProgressLog): Promise<void> {
         await spawnAndWatch(asSpawnCommand(
             `cf login -a ${cfi.api} -o ${cfi.org} -u ${cfi.username} -p '${cfi.password}' -s ${cfi.space}`),
             {}, log);
 
-        return spawnAndWatch(asSpawnCommand(`cf delete ${deployment.appName}`), {}, log);
+        await spawnAndWatch(asSpawnCommand(`cf delete ${deployment.appName}`), {}, log);
+        return;
     }
 
     public logInterpreter(log: string) {

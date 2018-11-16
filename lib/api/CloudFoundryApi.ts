@@ -14,8 +14,12 @@
  * limitations under the License.
  */
 
-import { doWithRetry } from "@atomist/automation-client";
-
+import {
+    DefaultHttpClientFactory,
+    doWithRetry,
+    HttpClient,
+    HttpMethod,
+} from "@atomist/automation-client";
 import axios, { AxiosResponse } from "axios";
 import cfClient = require("cf-client");
 import FormData = require("form-data");
@@ -65,12 +69,14 @@ export async function initializeCloudFoundry(cfi: CloudFoundryInfo): Promise<Clo
 export class CloudFoundryApi {
 
     private authHeader;
+    private readonly httpClient: HttpClient;
     private readonly jsonContentHeader = {
         "Content-Type": "application/json",
     };
 
     constructor(private readonly cf: CloudFoundryClientV2,
                 private readonly retryInterval: number = 1000) {
+        this.httpClient = DefaultHttpClientFactory.create(`${cf.api_url}`);
     }
 
     private async refreshToken() {
@@ -109,7 +115,7 @@ export class CloudFoundryApi {
         return doWithRetry(() => axios.post(
             `${this.cf.api_url}/v3/apps/${appGuid}/actions/stop`,
             undefined,
-            { headers: this.authHeader },
+            {headers: this.authHeader},
         ), `stop app ${appGuid}`);
     }
 
@@ -118,7 +124,7 @@ export class CloudFoundryApi {
         await doWithRetry(() => axios.post(
             `${this.cf.api_url}/v3/apps/${appGuid}/actions/start`,
             undefined,
-            { headers: this.authHeader },
+            {headers: this.authHeader},
         ), `start app ${appGuid}`);
         return this.retryUntilCondition(
             async () => {
@@ -175,7 +181,7 @@ export class CloudFoundryApi {
             {
                 name: appName,
             },
-            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) },
+            {headers: _.assign({}, this.authHeader, this.jsonContentHeader)},
         ), `rename app ${appGuid} to ${appName}`);
     }
 
@@ -192,7 +198,7 @@ export class CloudFoundryApi {
         await this.refreshToken();
         return doWithRetry(() => axios.delete(
             `${this.cf.api_url}/v3/apps/${appGuid}`,
-            { headers: this.authHeader },
+            {headers: this.authHeader},
         ), `delete app ${appGuid}`);
     }
 
@@ -200,22 +206,22 @@ export class CloudFoundryApi {
         await this.refreshToken();
         return doWithRetry(() => axios.get(
             `${this.cf.api_url}/v3/processes/${appGuid}/stats`,
-            { headers: this.authHeader },
+            {headers: this.authHeader},
         ), `get process stats ${appGuid}`);
     }
 
     public async uploadPackage(appGuid: string, packageFile: ReadStream): Promise<AxiosResponse<any>> {
         await this.refreshToken();
         const packageCreateResult = await doWithRetry(() => axios.post(`${this.cf.api_url}/v3/packages`, {
-            type: "bits",
-            relationships: {
-                app: {
-                    data: {
-                        guid: appGuid,
+                type: "bits",
+                relationships: {
+                    app: {
+                        data: {
+                            guid: appGuid,
+                        },
                     },
                 },
-            },
-        }, { headers: _.assign({}, this.authHeader, this.jsonContentHeader) }),
+            }, {headers: _.assign({}, this.authHeader, this.jsonContentHeader)}),
             `create package ${appGuid}`);
         const formData = FormData();
         formData.maxDataSize = Infinity;
@@ -226,18 +232,20 @@ export class CloudFoundryApi {
             url: packageCreateResult.data.links.upload.href,
             headers: uploadHeaders,
             formData:
-            {
-                bits: packageFile,
-            },
+                {
+                    bits: packageFile,
+                },
         };
         request(options, (error, response, body) => {
-            if (error) { throw new Error(error); }
+            if (error) {
+                throw new Error(error);
+            }
         });
         return this.retryUntilCondition(
             async () => {
                 await this.refreshToken();
                 return doWithRetry(() =>
-                    axios.get(packageCreateResult.data.links.self.href, { headers: this.authHeader }),
+                        axios.get(packageCreateResult.data.links.self.href, {headers: this.authHeader}),
                     `get package ${packageCreateResult.data.guid}`);
             },
             r => r.data.state === "READY",
@@ -248,16 +256,16 @@ export class CloudFoundryApi {
     public async buildDroplet(packageGuid: string): Promise<AxiosResponse<any>> {
         await this.refreshToken();
         const buildResult = await doWithRetry(() => axios.post(`${this.cf.api_url}/v3/builds`, {
-            package: {
-                guid: packageGuid,
+                package: {
+                    guid: packageGuid,
+                },
             },
-        },
-            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) }),
+            {headers: _.assign({}, this.authHeader, this.jsonContentHeader)}),
             `build droplet ${packageGuid}`);
         return this.retryUntilCondition(
             async () => {
                 await this.refreshToken();
-                return doWithRetry(() => axios.get(buildResult.data.links.self.href, { headers: this.authHeader }),
+                return doWithRetry(() => axios.get(buildResult.data.links.self.href, {headers: this.authHeader}),
                     `get build for package ${buildResult.data.guid}`);
             },
             r => r.data.state === "STAGED",
@@ -269,8 +277,8 @@ export class CloudFoundryApi {
         await this.refreshToken();
         return doWithRetry(() => axios.patch(
             `${this.cf.api_url}/v3/apps/${appGuid}/relationships/current_droplet`,
-            { data: { guid: dropletGuid } },
-            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) },
+            {data: {guid: dropletGuid}},
+            {headers: _.assign({}, this.authHeader, this.jsonContentHeader)},
         ), `set current droplet for app ${appGuid}`);
     }
 
@@ -308,7 +316,7 @@ export class CloudFoundryApi {
 
     public async addRouteToApp(spaceGuid: string, appGuid: string, hostName: string, domainGuid: string): Promise<any> {
         await this.refreshToken();
-        const routesMatchingHost = await this.cf.routes.getRoutes({ q: `host:${hostName}` });
+        const routesMatchingHost = await this.cf.routes.getRoutes({q: `host:${hostName}`});
         const existingRoute = routesMatchingHost.resources.find(r =>
             r.entity.domain_guid === domainGuid && r.entity.space_guid === spaceGuid);
         const route = existingRoute ? existingRoute : await this.cf.routes.add({
@@ -349,10 +357,36 @@ export class CloudFoundryApi {
         return undefined;
     }
 
-    public async getSpaceByName(spaceName: string): Promise<any> {
+    public async getSpaceByName(organisationGuid: string, spaceName: string): Promise<any> {
         await this.refreshToken();
-        const spaces = await this.cf.spaces.getSpaces({ q: `name:${spaceName}` });
-        return _.head(spaces.resources);
+        const response = await this.httpClient.exchange(
+            `${this.cf.api_url}/v2/spaces?q=organization_guid:${organisationGuid}`,
+            {
+            method: HttpMethod.Get,
+            headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+            },
+        );
+        const responseData = response.body as any;
+        if (responseData.total_results > 0) {
+            const spaces = responseData.resources as any[];
+            return _.head(spaces.filter(value => value.entity.name === spaceName));
+        } else {
+            return undefined;
+        }
+    }
+
+    public async getOrganisationGuidByName(orgName: string): Promise<any> {
+        await this.refreshToken();
+        const response = await this.httpClient.exchange(`${this.cf.api_url}/v2/organizations?q=name:${orgName}`, {
+            method: HttpMethod.Get,
+            headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+        });
+        const orgs = response.body as any;
+        if (orgs.total_results === 1) {
+            return orgs.resources[0].metadata.guid;
+        } else {
+            return undefined;
+        }
     }
 
 }

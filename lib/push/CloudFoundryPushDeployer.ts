@@ -53,22 +53,16 @@ export class CloudFoundryPushDeployer implements Deployer<CloudFoundryInfo, Clou
     constructor(private readonly projectLoader: ProjectLoader) {
     }
 
-    private async getManifest(p: Project): Promise<Manifest> {
-        const manifestFile = await p.findFile(CloudFoundryManifestPath);
-        const manifestContent = await manifestFile.getContent();
-        return yaml.load(manifestContent);
-    }
-
     public async deploy(da: DeployableArtifact,
                         cfi: CloudFoundryInfo,
                         log: ProgressLog,
                         credentials: ProjectOperationCredentials,
                         team: string): Promise<CloudFoundryDeployment[]> {
-        logger.info("Deploying app [%j] to Cloud Foundry [%j]", da, {...cfi, password: "REDACTED"});
+        logger.info("Deploying app [%j] to Cloud Foundry [%j]", da, { ...cfi, password: "REDACTED" });
         if (!cfi.api || !cfi.username || !cfi.password || !cfi.space) {
             throw new Error("cloud foundry authentication information missing. See CloudFoundryTarget.ts");
         }
-        return this.projectLoader.doWithProject({credentials, id: da.id, readOnly: !da.cwd}, async project => {
+        return this.projectLoader.doWithProject({ credentials, id: da.id, readOnly: !da.cwd }, async project => {
             const archiver = new ProjectArchiver(log);
             const packageFile = await archiver.archive(project, da);
             const manifest = await this.getManifest(project);
@@ -89,7 +83,7 @@ export class CloudFoundryPushDeployer implements Deployer<CloudFoundryInfo, Clou
         if (!cfi.api || !cfi.username || !cfi.password || !cfi.space) {
             throw new Error("cloud foundry authentication information missing. See CloudFoundryTarget.ts");
         }
-        return this.projectLoader.doWithProject({credentials, id, readOnly: true}, async project => {
+        return this.projectLoader.doWithProject({ credentials, id, readOnly: true }, async project => {
             const manifest = await this.getManifest(project);
             const cfClient = await initializeCloudFoundry(cfi);
             const cfApi = new CloudFoundryApi(cfClient);
@@ -130,10 +124,16 @@ export class CloudFoundryPushDeployer implements Deployer<CloudFoundryInfo, Clou
         }
     }
 
-   public logInterpreter(log: string): InterpretedLog {
+    public logInterpreter(log: string): InterpretedLog {
         return {
             relevantPart: log.split("\n").slice(-10).join("\n"),
             message: "Oh no!",
         };
-   }
+    }
+
+    private async getManifest(p: Project): Promise<Manifest> {
+        const manifestFile = await p.findFile(CloudFoundryManifestPath);
+        const manifestContent = await manifestFile.getContent();
+        return yaml.load(manifestContent);
+    }
 }

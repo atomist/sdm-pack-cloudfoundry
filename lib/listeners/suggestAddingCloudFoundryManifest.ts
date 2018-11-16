@@ -57,9 +57,9 @@ export const SuggestAddingCloudFoundryManifest: ChannelLinkListener = async inv 
     const attachment: Attachment = {
         text: "Add a Cloud Foundry manifest to your new repo?",
         fallback: "add PCF manifest",
-        actions: [buttonForCommand({text: "Add Cloud Foundry Manifest"},
+        actions: [buttonForCommand({ text: "Add Cloud Foundry Manifest" },
             AddCloudFoundryManifest.name,
-            {"targets.owner": inv.id.owner, "targets.repo": inv.id.repo},
+            { "targets.owner": inv.id.owner, "targets.repo": inv.id.repo },
         ),
         ],
     };
@@ -83,7 +83,7 @@ export function suggestAddingCloudFoundryManifestOnNewRepo(projectLoader: Projec
                     fallback: `Add a Cloud Foundry manifest to ${inv.id.owner}/${inv.id.repo}?`,
                     actions: [buttonForCommand({ text: "Add Cloud Foundry Manifest" },
                         AddCloudFoundryManifest.name,
-                        {"targets.owner": inv.id.owner, "targets.repo": inv.id.repo},
+                        { "targets.owner": inv.id.owner, "targets.repo": inv.id.repo },
                     ),
                     ],
                 };

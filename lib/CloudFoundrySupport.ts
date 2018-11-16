@@ -67,11 +67,11 @@ export function CloudFoundrySupport(options: CloudFoundrySupportOptions): Extens
                     suggestAddingCloudFoundryManifestOnNewRepo(sdm.configuration.sdm.projectLoader));
 
             if (!!options.inspectGoal) {
-                    if (options.reviewListeners) {
-                        const listeners = Array.isArray(options.reviewListeners) ?
-                            options.reviewListeners : [options.reviewListeners];
-                        listeners.forEach(l => options.inspectGoal.withListener(l));
-                    }
+                if (options.reviewListeners) {
+                    const listeners = Array.isArray(options.reviewListeners) ?
+                        options.reviewListeners : [options.reviewListeners];
+                    listeners.forEach(l => options.inspectGoal.withListener(l));
+                }
             }
             if (!!options.pushImpactGoal) {
                 options.pushImpactGoal

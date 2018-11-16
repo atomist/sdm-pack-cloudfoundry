@@ -14,9 +14,7 @@
  * limitations under the License.
  */
 
-import {
-    logger,
-} from "@atomist/automation-client";
+import { logger } from "@atomist/automation-client";
 import {
     checkOutArtifact,
     DefaultGoalNameGenerator,
@@ -92,7 +90,7 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
 
 function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegistration): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const {sdmGoal, credentials, id, context, progressLog, configuration} = goalInvocation;
+        const { sdmGoal, credentials, id, context, progressLog, configuration } = goalInvocation;
         const atomistTeam = context.workspaceId;
 
         logger.info("Deploying project %s:%s to CloudFoundry in %s]", id.owner, id.repo, registration.environment);

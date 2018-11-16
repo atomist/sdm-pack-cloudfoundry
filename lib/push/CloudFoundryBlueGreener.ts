@@ -86,7 +86,7 @@ export class CloudFoundryBlueGreener {
             const anyRoute = currentRoutes[0];
             const domain = await this.cfApi.getDomainByGuid(anyRoute.entity.domain_guid);
             const endpoint = `https://${anyRoute.entity.host}.${domain.entity.name}`;
-            return _.assign({}, deployment, {endpoint});
+            return _.assign({}, deployment, { endpoint });
         }
         return deployment;
     }

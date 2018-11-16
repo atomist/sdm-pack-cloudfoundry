@@ -79,43 +79,12 @@ export class CloudFoundryApi {
         this.httpClient = DefaultHttpClientFactory.create(`${cf.api_url}`);
     }
 
-    private async refreshToken() {
-        const newToken = await this.cf.usersUaa.refreshToken();
-        this.cf.token = newToken;
-        this.authHeader = {
-            Authorization: `${newToken.token_type} ${newToken.access_token}`,
-        };
-        this.cf.usersUaa.setToken(newToken);
-        this.cf.apps.setToken(newToken);
-        this.cf.domains.setToken(newToken);
-        this.cf.spaces.setToken(newToken);
-        this.cf.serviceBindings.setToken(newToken);
-        this.cf.userProvidedServices.setToken(newToken);
-        this.cf.routes.setToken(newToken);
-    }
-
-    private async retryUntilCondition(action: () => Promise<AxiosResponse>,
-                                      successCondition: (r: AxiosResponse) => boolean,
-                                      failureCondition: (r: AxiosResponse) => boolean): Promise<AxiosResponse> {
-        const result = await action();
-        if (successCondition(result)) {
-            return result;
-        }
-        if (failureCondition(result)) {
-            const error = new Error(JSON.stringify(result.data));
-            error.name = "RetryUntilConditionFailure";
-            throw error;
-        }
-        await new Promise<AxiosResponse>(res => setTimeout(res, this.retryInterval));
-        return this.retryUntilCondition(action, successCondition, failureCondition);
-    }
-
     public async stopApp(appGuid: string): Promise<AxiosResponse<any>> {
         await this.refreshToken();
         return doWithRetry(() => axios.post(
             `${this.cf.api_url}/v3/apps/${appGuid}/actions/stop`,
             undefined,
-            {headers: this.authHeader},
+            { headers: this.authHeader },
         ), `stop app ${appGuid}`);
     }
 
@@ -124,7 +93,7 @@ export class CloudFoundryApi {
         await doWithRetry(() => axios.post(
             `${this.cf.api_url}/v3/apps/${appGuid}/actions/start`,
             undefined,
-            {headers: this.authHeader},
+            { headers: this.authHeader },
         ), `start app ${appGuid}`);
         return this.retryUntilCondition(
             async () => {
@@ -181,24 +150,15 @@ export class CloudFoundryApi {
             {
                 name: appName,
             },
-            {headers: _.assign({}, this.authHeader, this.jsonContentHeader)},
+            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) },
         ), `rename app ${appGuid} to ${appName}`);
-    }
-
-    private normalizeManifestMemory(memory: string): number {
-        if (memory.endsWith("M")) {
-            return +memory.replace("M", "");
-        } else if (memory.endsWith("G")) {
-            return +memory.replace("G", "") * 1000;
-        }
-        return +memory;
     }
 
     public async deleteApp(appGuid: string): Promise<AxiosResponse<any>> {
         await this.refreshToken();
         return doWithRetry(() => axios.delete(
             `${this.cf.api_url}/v3/apps/${appGuid}`,
-            {headers: this.authHeader},
+            { headers: this.authHeader },
         ), `delete app ${appGuid}`);
     }
 
@@ -206,7 +166,7 @@ export class CloudFoundryApi {
         await this.refreshToken();
         return doWithRetry(() => axios.get(
             `${this.cf.api_url}/v3/processes/${appGuid}/stats`,
-            {headers: this.authHeader},
+            { headers: this.authHeader },
         ), `get process stats ${appGuid}`);
     }
 
@@ -221,7 +181,7 @@ export class CloudFoundryApi {
                         },
                     },
                 },
-            }, {headers: _.assign({}, this.authHeader, this.jsonContentHeader)}),
+            }, { headers: _.assign({}, this.authHeader, this.jsonContentHeader) }),
             `create package ${appGuid}`);
         const formData = FormData();
         formData.maxDataSize = Infinity;
@@ -245,7 +205,7 @@ export class CloudFoundryApi {
             async () => {
                 await this.refreshToken();
                 return doWithRetry(() =>
-                        axios.get(packageCreateResult.data.links.self.href, {headers: this.authHeader}),
+                        axios.get(packageCreateResult.data.links.self.href, { headers: this.authHeader }),
                     `get package ${packageCreateResult.data.guid}`);
             },
             r => r.data.state === "READY",
@@ -260,12 +220,12 @@ export class CloudFoundryApi {
                     guid: packageGuid,
                 },
             },
-            {headers: _.assign({}, this.authHeader, this.jsonContentHeader)}),
+            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) }),
             `build droplet ${packageGuid}`);
         return this.retryUntilCondition(
             async () => {
                 await this.refreshToken();
-                return doWithRetry(() => axios.get(buildResult.data.links.self.href, {headers: this.authHeader}),
+                return doWithRetry(() => axios.get(buildResult.data.links.self.href, { headers: this.authHeader }),
                     `get build for package ${buildResult.data.guid}`);
             },
             r => r.data.state === "STAGED",
@@ -277,8 +237,8 @@ export class CloudFoundryApi {
         await this.refreshToken();
         return doWithRetry(() => axios.patch(
             `${this.cf.api_url}/v3/apps/${appGuid}/relationships/current_droplet`,
-            {data: {guid: dropletGuid}},
-            {headers: _.assign({}, this.authHeader, this.jsonContentHeader)},
+            { data: { guid: dropletGuid } },
+            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) },
         ), `set current droplet for app ${appGuid}`);
     }
 
@@ -316,7 +276,7 @@ export class CloudFoundryApi {
 
     public async addRouteToApp(spaceGuid: string, appGuid: string, hostName: string, domainGuid: string): Promise<any> {
         await this.refreshToken();
-        const routesMatchingHost = await this.cf.routes.getRoutes({q: `host:${hostName}`});
+        const routesMatchingHost = await this.cf.routes.getRoutes({ q: `host:${hostName}` });
         const existingRoute = routesMatchingHost.resources.find(r =>
             r.entity.domain_guid === domainGuid && r.entity.space_guid === spaceGuid);
         const route = existingRoute ? existingRoute : await this.cf.routes.add({
@@ -362,8 +322,8 @@ export class CloudFoundryApi {
         const response = await this.httpClient.exchange(
             `${this.cf.api_url}/v2/spaces?q=organization_guid:${organisationGuid}`,
             {
-            method: HttpMethod.Get,
-            headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+                method: HttpMethod.Get,
+                headers: _.assign({}, this.authHeader, this.jsonContentHeader),
             },
         );
         const responseData = response.body as any;
@@ -387,6 +347,46 @@ export class CloudFoundryApi {
         } else {
             return undefined;
         }
+    }
+
+    private async refreshToken() {
+        const newToken = await this.cf.usersUaa.refreshToken();
+        this.cf.token = newToken;
+        this.authHeader = {
+            Authorization: `${newToken.token_type} ${newToken.access_token}`,
+        };
+        this.cf.usersUaa.setToken(newToken);
+        this.cf.apps.setToken(newToken);
+        this.cf.domains.setToken(newToken);
+        this.cf.spaces.setToken(newToken);
+        this.cf.serviceBindings.setToken(newToken);
+        this.cf.userProvidedServices.setToken(newToken);
+        this.cf.routes.setToken(newToken);
+    }
+
+    private async retryUntilCondition(action: () => Promise<AxiosResponse>,
+                                      successCondition: (r: AxiosResponse) => boolean,
+                                      failureCondition: (r: AxiosResponse) => boolean): Promise<AxiosResponse> {
+        const result = await action();
+        if (successCondition(result)) {
+            return result;
+        }
+        if (failureCondition(result)) {
+            const error = new Error(JSON.stringify(result.data));
+            error.name = "RetryUntilConditionFailure";
+            throw error;
+        }
+        await new Promise<AxiosResponse>(res => setTimeout(res, this.retryInterval));
+        return this.retryUntilCondition(action, successCondition, failureCondition);
+    }
+
+    private normalizeManifestMemory(memory: string): number {
+        if (memory.endsWith("M")) {
+            return +memory.replace("M", "");
+        } else if (memory.endsWith("G")) {
+            return +memory.replace("G", "") * 1000;
+        }
+        return +memory;
     }
 
 }

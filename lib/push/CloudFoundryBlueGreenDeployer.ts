@@ -55,12 +55,6 @@ export class CloudFoundryBlueGreenDeployer implements Deployer<CloudFoundryInfo,
     constructor(private readonly projectLoader: ProjectLoader) {
     }
 
-    private async getManifest(p: Project): Promise<Manifest> {
-        const manifestFile = await p.findFile(CloudFoundryManifestPath);
-        const manifestContent = await manifestFile.getContent();
-        return yaml.load(manifestContent);
-    }
-
     public async deploy(da: DeployableArtifact,
                         cfi: CloudFoundryInfo,
                         log: ProgressLog,
@@ -72,7 +66,7 @@ export class CloudFoundryBlueGreenDeployer implements Deployer<CloudFoundryInfo,
             log.write(msg);
             throw new Error(msg);
         }
-        return this.projectLoader.doWithProject({credentials, id: da.id, readOnly: !da.cwd}, async project => {
+        return this.projectLoader.doWithProject({ credentials, id: da.id, readOnly: !da.cwd }, async project => {
             const archiver = new ProjectArchiver(log);
             const packageFile = await archiver.archive(project, da);
             const manifest = await this.getManifest(project);
@@ -109,13 +103,13 @@ export class CloudFoundryBlueGreenDeployer implements Deployer<CloudFoundryInfo,
         if (!cfi.api || !cfi.username || !cfi.password || !cfi.space) {
             throw new Error("cloud foundry authentication information missing. See CloudFoundryTarget.ts");
         }
-        return this.projectLoader.doWithProject({credentials, id, readOnly: true}, async project => {
+        return this.projectLoader.doWithProject({ credentials, id, readOnly: true }, async project => {
             const manifest = await this.getManifest(project);
             const cfClient = await initializeCloudFoundry(cfi);
             const cfApi = new CloudFoundryApi(cfClient);
             const pusher = new CloudFoundryPusher(cfApi, cfi.org, cfi.space);
             const spaceGuid = await pusher.getSpaceGuid();
-            const appNames = manifest.applications.map( manifestApp => {
+            const appNames = manifest.applications.map(manifestApp => {
                 const namer = new BlueGreenNamer(manifestApp.name);
                 return [namer.getCurrentAppName(), namer.getPreviousAppName(), namer.getNextAppName()];
             });
@@ -152,10 +146,16 @@ export class CloudFoundryBlueGreenDeployer implements Deployer<CloudFoundryInfo,
         }
     }
 
-   public logInterpreter(log: string): InterpretedLog {
+    public logInterpreter(log: string): InterpretedLog {
         return {
             relevantPart: log.split("\n").slice(-10).join("\n"),
             message: "Oh no!",
         };
-   }
+    }
+
+    private async getManifest(p: Project): Promise<Manifest> {
+        const manifestFile = await p.findFile(CloudFoundryManifestPath);
+        const manifestContent = await manifestFile.getContent();
+        return yaml.load(manifestContent);
+    }
 }

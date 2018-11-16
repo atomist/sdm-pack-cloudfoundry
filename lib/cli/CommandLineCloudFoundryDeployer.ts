@@ -20,7 +20,6 @@ import {
     logger,
     ProjectOperationCredentials,
     RemoteRepoRef,
-    spawnAndWatch,
     SpawnCommand,
     stringifySpawnCommand,
 } from "@atomist/automation-client";
@@ -30,6 +29,7 @@ import {
     Deployer,
     ProgressLog,
     ProjectLoader,
+    spawnAndWatch,
 } from "@atomist/sdm";
 import { spawn } from "child_process";
 import {
@@ -56,7 +56,7 @@ export class CommandLineCloudFoundryDeployer implements Deployer<CloudFoundryInf
 
         // We need the Cloud Foundry manifest. If it's not found, we can't deploy
         // We want a fresh version unless we need it build
-        return this.projectLoader.doWithProject({credentials, id: da.id, readOnly: !da.cwd}, async project => {
+        return this.projectLoader.doWithProject({ credentials, id: da.id, readOnly: !da.cwd }, async project => {
             const manifestFile = await project.findFile(CloudFoundryManifestPath);
 
             if (!cfi.api || !cfi.org || !cfi.username || !cfi.password) {
@@ -118,9 +118,9 @@ export class CommandLineCloudFoundryDeployer implements Deployer<CloudFoundryInf
     }
 
     public async undeploy(
-            cfi: CloudFoundryInfo,
-            deployment: CloudFoundryDeployment,
-            log: ProgressLog): Promise<void> {
+        cfi: CloudFoundryInfo,
+        deployment: CloudFoundryDeployment,
+        log: ProgressLog): Promise<void> {
         await spawnAndWatch(asSpawnCommand(
             `cf login -a ${cfi.api} -o ${cfi.org} -u ${cfi.username} -p '${cfi.password}' -s ${cfi.space}`),
             {}, log);

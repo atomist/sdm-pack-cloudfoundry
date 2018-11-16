@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.1...HEAD)
 
+### Fixed
+
+-   Cloudfoundry deployment using API or blue/green deployment takes organization into account. [#19](https://github.com/atomist/sdm-pack-cloudfoundry/issues/19)
+
 ## [1.0.1](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.0-RC.2...1.0.1) - 2018-11-09
 
 ## [1.0.0-RC.2](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.0-RC.1...1.0.0-RC.2) - 2018-10-30

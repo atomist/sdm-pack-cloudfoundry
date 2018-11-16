@@ -28,7 +28,6 @@ import {
     ProjectLoader,
 } from "@atomist/sdm";
 import * as yaml from "js-yaml";
-
 import * as _ from "lodash";
 import {
     CloudFoundryApi,
@@ -121,7 +120,7 @@ export class CloudFoundryBlueGreenDeployer implements Deployer<CloudFoundryInfo,
             return onlyExistingAppNames.map(appName => {
                 return {
                     appName,
-                } as CloudFoundryDeployment;
+                };
             });
         });
     }

@@ -21,20 +21,19 @@ import {
 } from "@atomist/sdm";
 import archiver = require("archiver");
 import * as fs from "fs";
-import { ReadStream } from "fs";
 
 export class ProjectArchiver {
 
     constructor(private readonly log: ProgressLog) {
     }
 
-    public async archive(p: GitProject, da: DeployableArtifact): Promise<ReadStream> {
+    public async archive(p: GitProject, da: DeployableArtifact): Promise<fs.ReadStream> {
         if (!!da.filename) {
             const archiveFile = `${da.cwd}/${da.filename}`;
             this.log.write(`Using archive ${archiveFile}`);
             return fs.createReadStream(archiveFile);
         } else {
-            return new Promise<ReadStream>((resolve, reject) => {
+            return new Promise<fs.ReadStream>((resolve, reject) => {
                 this.log.write(`Creating archive for directory ${p.baseDir}`);
                 // tslint:disable-next-line:no-floating-promises
                 this.log.flush();

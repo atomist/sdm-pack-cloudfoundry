@@ -68,9 +68,9 @@ export async function initializeCloudFoundry(cfi: CloudFoundryInfo): Promise<Clo
  */
 export class CloudFoundryApi {
 
-    private authHeader;
+    private authHeader: any;
     private readonly httpClient: HttpClient;
-    private readonly jsonContentHeader = {
+    private readonly jsonContentHeader: any = {
         "Content-Type": "application/json",
     };
 
@@ -349,7 +349,7 @@ export class CloudFoundryApi {
         }
     }
 
-    private async refreshToken() {
+    private async refreshToken(): Promise<void> {
         const newToken = await this.cf.usersUaa.refreshToken();
         this.cf.token = newToken;
         this.authHeader = {

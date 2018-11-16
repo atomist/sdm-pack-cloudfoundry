@@ -15,7 +15,6 @@
  */
 
 import {
-    CommandListenerInvocation,
     PushImpactListener,
     PushImpactListenerRegistration,
     SoftwareDeliveryMachine,
@@ -41,8 +40,11 @@ export function enableDeployOnCloudFoundryManifestAdditionListener(
             await setDeployEnablement({
                 commandName: "addCloudFoundryManifest",
                 parameters,
-                ...pil,
-            } as CommandListenerInvocation<SetDeployEnablementParameters>, true);
+                context: pil.context,
+                credentials: pil.credentials,
+                addressChannels: pil.addressChannels,
+                ids: [pil.id],
+            }, true);
         }
     };
 }

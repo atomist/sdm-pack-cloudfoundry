@@ -27,7 +27,6 @@ import {
     Goal,
     GoalDefinition,
     GoalInvocation,
-    Implementation,
     ImplementationRegistration,
     IndependentOfEnvironment,
 } from "@atomist/sdm";
@@ -82,8 +81,8 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
         this.addFulfillment({
             name: DefaultGoalNameGenerator.generateName("cf-deployer"),
             goalExecutor: executeCloudFoundryDeployment(registration),
-            ...registration as ImplementationRegistration,
-        } as Implementation);
+            ...registration,
+        });
         return this;
     }
 }
@@ -124,7 +123,7 @@ function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegis
             return {
                 code: 0,
                 targetUrl: deployment.endpoint,
-            } as ExecuteGoalResult;
+            };
         }));
 
         return _.head(results);

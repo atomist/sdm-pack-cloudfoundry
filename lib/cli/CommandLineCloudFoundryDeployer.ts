@@ -129,7 +129,7 @@ export class CommandLineCloudFoundryDeployer implements Deployer<CloudFoundryInf
         return;
     }
 
-    public logInterpreter(log: string) {
+    public logInterpreter(log: string): any {
         return {
             relevantPart: "",
             message: "Deploy failed",

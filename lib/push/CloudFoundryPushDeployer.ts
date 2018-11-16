@@ -101,7 +101,7 @@ export class CloudFoundryPushDeployer implements Deployer<CloudFoundryInfo, Clou
             return appNames.map(appName => {
                 return {
                     appName,
-                } as CloudFoundryDeployment;
+                };
             });
         });
     }

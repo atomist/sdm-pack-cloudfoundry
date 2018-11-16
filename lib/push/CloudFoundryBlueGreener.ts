@@ -26,15 +26,15 @@ export class BlueGreenNamer {
     constructor(private readonly currentAppName: string) {
     }
 
-    public getCurrentAppName() {
+    public getCurrentAppName(): string {
         return `${this.currentAppName}`;
     }
 
-    public getPreviousAppName() {
+    public getPreviousAppName(): string {
         return `${this.currentAppName}-old`;
     }
 
-    public getNextAppName() {
+    public getNextAppName(): string {
         return `${this.currentAppName}-new`;
     }
 }
@@ -47,7 +47,7 @@ export class CloudFoundryBlueGreener {
                 private readonly log: ProgressLog) {
     }
 
-    public async cleanUpExistingBlueGreenApps() {
+    public async cleanUpExistingBlueGreenApps(): Promise<void> {
         const spaceGuid = await this.pusher.getSpaceGuid();
         const previousApp = await this.cfApi.getApp(spaceGuid, this.namer.getPreviousAppName());
         if (previousApp) {
@@ -91,7 +91,7 @@ export class CloudFoundryBlueGreener {
         return deployment;
     }
 
-    public async retireCurrentApp() {
+    public async retireCurrentApp(): Promise<any> {
         const spaceGuid = await this.pusher.getSpaceGuid();
         const nextApp = await this.cfApi.getApp(spaceGuid, this.namer.getNextAppName());
         if (!nextApp) {

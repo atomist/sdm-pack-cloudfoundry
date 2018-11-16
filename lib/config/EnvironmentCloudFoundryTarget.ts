@@ -29,13 +29,13 @@ import {
  */
 export class EnvironmentCloudFoundryTarget implements CloudFoundryInfo {
 
-    public api = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").api || PivotalWebServices.api;
+    public api: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").api || PivotalWebServices.api;
 
-    public username = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").user;
+    public username: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").user;
 
-    public password = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").password;
+    public password: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").password;
 
-    public org = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").org;
+    public org: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").org;
 
     /**
      * Logical name for the space
@@ -44,7 +44,7 @@ export class EnvironmentCloudFoundryTarget implements CloudFoundryInfo {
     constructor(private readonly environmentName: "staging" | "production") {
     }
 
-    get space() {
+    get space(): string {
         const space = configurationValue<CloudfoundryOptions>(`sdm.cloudfoundry`).spaces[this.environmentName];
         logger.info("PCF space for environment [%s] is [%s]", this.environmentName, space);
         if (!space) {
@@ -54,11 +54,11 @@ export class EnvironmentCloudFoundryTarget implements CloudFoundryInfo {
         return space;
     }
 
-    get name() {
+    get name(): string {
         return `PCF: ${this.environmentName}`;
     }
 
-    get description() {
+    get description(): string {
         return `PCF ${this.api};org=${this.org};space=${this.space};user=${this.username}`;
     }
 }

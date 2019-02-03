@@ -92,7 +92,7 @@ function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegis
         const { sdmGoal, credentials, id, context, progressLog, configuration } = goalInvocation;
         const atomistTeam = context.workspaceId;
 
-        logger.info("Deploying project %s:%s to CloudFoundry in %s environment]", id.owner, id.repo, registration.environment);
+        logger.info("Deploying project %s:%s to CloudFoundry in %s]", id.owner, id.repo, registration.environment);
 
         const artifactCheckout = await checkOutArtifact(_.get(sdmGoal, "push.after.image.imageName"),
             configuration.sdm.artifactStore, id, credentials, progressLog);

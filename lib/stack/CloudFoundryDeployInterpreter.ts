@@ -25,7 +25,10 @@ import {
     Interpreter,
 } from "@atomist/sdm-pack-analysis";
 import * as _ from "lodash";
-import { CloudFoundryDeploy, CloudFoundryDeploymentStrategy } from "../goals/CloudFoundryPushDeploy";
+import {
+    CloudFoundryDeploy,
+    CloudFoundryDeploymentStrategy,
+} from "../goals/CloudFoundryPushDeploy";
 
 /**
  * Deploy to PCF staging and production, requiring approval for each step.

@@ -19,8 +19,8 @@ import {
     doWithRetry,
     HttpClient,
     HttpMethod,
+    HttpResponse,
 } from "@atomist/automation-client";
-import axios, { AxiosResponse } from "axios";
 import cfClient = require("cf-client");
 import FormData = require("form-data");
 import { ReadStream } from "fs";
@@ -77,29 +77,32 @@ export class CloudFoundryApi {
         this.httpClient = DefaultHttpClientFactory.create(`${cf.api_url}`);
     }
 
-    public async stopApp(appGuid: string): Promise<AxiosResponse<any>> {
+    public async stopApp(appGuid: string): Promise<HttpResponse<any>> {
         await this.refreshToken();
-        return doWithRetry(() => axios.post(
+        return doWithRetry(() => this.httpClient.exchange(
             `${this.cf.api_url}/v3/apps/${appGuid}/actions/stop`,
-            undefined,
-            { headers: this.authHeader },
-        ), `stop app ${appGuid}`);
+            {
+                method: HttpMethod.Post,
+                headers: this.authHeader,
+            }), `stop app ${appGuid}`);
     }
 
-    public async startApp(appGuid: string): Promise<AxiosResponse<any>> {
+    public async startApp(appGuid: string): Promise<HttpResponse<any>> {
         await this.refreshToken();
-        await doWithRetry(() => axios.post(
+        await doWithRetry(() => this.httpClient.exchange(
             `${this.cf.api_url}/v3/apps/${appGuid}/actions/start`,
-            undefined,
-            { headers: this.authHeader },
+            {
+                method: HttpMethod.Post,
+                headers: this.authHeader,
+            },
         ), `start app ${appGuid}`);
         return this.retryUntilCondition(
             async () => {
                 await this.refreshToken();
                 return this.getProcessStats(appGuid);
             },
-            r => _.every(r.data.resources, (p: any) => p.state === "RUNNING"),
-            r => _.every(r.data.resources, (p: any) => p.state === "CRASHED"),
+            r => _.every(r.body.resources, (p: any) => p.state === "RUNNING"),
+            r => _.every(r.body.resources, (p: any) => p.state === "CRASHED"),
         );
     }
 
@@ -143,51 +146,66 @@ export class CloudFoundryApi {
 
     public async renameApp(appGuid: string, appName: string): Promise<any> {
         await this.refreshToken();
-        return doWithRetry(() => axios.patch(
+        return doWithRetry(() => this.httpClient.exchange(
             `${this.cf.api_url}/v3/apps/${appGuid}`,
             {
-                name: appName,
+                method: HttpMethod.Patch,
+                headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+                body: {
+                    name: appName,
+                },
             },
-            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) },
         ), `rename app ${appGuid} to ${appName}`);
     }
 
-    public async deleteApp(appGuid: string): Promise<AxiosResponse<any>> {
+    public async deleteApp(appGuid: string): Promise<HttpResponse<any>> {
         await this.refreshToken();
-        return doWithRetry(() => axios.delete(
+        return doWithRetry(() => this.httpClient.exchange(
             `${this.cf.api_url}/v3/apps/${appGuid}`,
-            { headers: this.authHeader },
+            {
+                method: HttpMethod.Delete,
+                headers: this.authHeader,
+            },
         ), `delete app ${appGuid}`);
     }
 
-    public async getProcessStats(appGuid: string): Promise<AxiosResponse<any>> {
+    public async getProcessStats(appGuid: string): Promise<HttpResponse<any>> {
         await this.refreshToken();
-        return doWithRetry(() => axios.get(
+        return doWithRetry(() => this.httpClient.exchange(
             `${this.cf.api_url}/v3/processes/${appGuid}/stats`,
-            { headers: this.authHeader },
+            {
+                method: HttpMethod.Get,
+                headers: this.authHeader,
+            },
         ), `get process stats ${appGuid}`);
     }
 
-    public async uploadPackage(appGuid: string, packageFile: ReadStream): Promise<AxiosResponse<any>> {
+    public async uploadPackage(appGuid: string, packageFile: ReadStream): Promise<HttpResponse<any>> {
         await this.refreshToken();
-        const packageCreateResult = await doWithRetry(() => axios.post(`${this.cf.api_url}/v3/packages`, {
-                type: "bits",
-                relationships: {
-                    app: {
-                        data: {
-                            guid: appGuid,
+        const packageCreateResult = await doWithRetry(() => this.httpClient.exchange<any>(`${this.cf.api_url}/v3/packages`,
+            {
+                body: {
+                    type: "bits",
+                    relationships: {
+                        app: {
+                            data: {
+                                guid: appGuid,
+                            },
                         },
                     },
                 },
-            }, { headers: _.assign({}, this.authHeader, this.jsonContentHeader) }),
+                headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+                method: HttpMethod.Post,
+            }),
             `create package ${appGuid}`);
         const formData = new FormData();
         formData.append("bits", packageFile);
         const uploadHeaders = _.assign({}, this.authHeader, formData.getHeaders());
-        return axios.post(
-            packageCreateResult.data.links.upload.href,
-            formData,
+        return this.httpClient.exchange(
+            packageCreateResult.body.links.upload.href,
             {
+                method: HttpMethod.Post,
+                body: formData,
                 headers: uploadHeaders,
             },
         ).then(() => {
@@ -195,11 +213,16 @@ export class CloudFoundryApi {
                     async () => {
                         await this.refreshToken();
                         return doWithRetry(() =>
-                                axios.get(packageCreateResult.data.links.self.href, {headers: this.authHeader}),
-                            `get package ${packageCreateResult.data.guid}`);
+                                this.httpClient.exchange(
+                                    packageCreateResult.body.links.self.href,
+                                    {
+                                        headers: this.authHeader,
+                                        method: HttpMethod.Get,
+                                    }),
+                            `get package ${packageCreateResult.body.guid}`);
                     },
-                    r => r.data.state === "READY",
-                    r => r.data.state === "FAILED",
+                    r => r.body.state === "READY",
+                    r => r.body.state === "FAILED",
                 );
             },
         ).catch(reason => {
@@ -208,32 +231,44 @@ export class CloudFoundryApi {
         );
     }
 
-    public async buildDroplet(packageGuid: string): Promise<AxiosResponse<any>> {
+    public async buildDroplet(packageGuid: string): Promise<HttpResponse<any>> {
         await this.refreshToken();
-        const buildResult = await doWithRetry(() => axios.post(`${this.cf.api_url}/v3/builds`, {
-                package: {
-                    guid: packageGuid,
+        const buildResult = await doWithRetry(() => this.httpClient.exchange<any>(`${this.cf.api_url}/v3/builds`,
+            {
+                headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+                method: HttpMethod.Post,
+                body: {
+                    package: {
+                        guid: packageGuid,
+                    },
                 },
-            },
-            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) }),
+            }),
             `build droplet ${packageGuid}`);
         return this.retryUntilCondition(
             async () => {
                 await this.refreshToken();
-                return doWithRetry(() => axios.get(buildResult.data.links.self.href, { headers: this.authHeader }),
-                    `get build for package ${buildResult.data.guid}`);
+                return doWithRetry(() => this.httpClient.exchange(
+                    buildResult.body.links.self.href,
+                    {
+                        headers: this.authHeader,
+                        method: HttpMethod.Get,
+                    }),
+                    `get build for package ${buildResult.body.guid}`);
             },
-            r => r.data.state === "STAGED",
-            r => r.data.state === "FAILED" || r.data.state === "EXPIRED",
+            r => r.body.state === "STAGED",
+            r => r.body.state === "FAILED" || r.body.state === "EXPIRED",
         );
     }
 
-    public async setCurrentDropletForApp(appGuid: string, dropletGuid: string): Promise<AxiosResponse<any>> {
+    public async setCurrentDropletForApp(appGuid: string, dropletGuid: string): Promise<HttpResponse<any>> {
         await this.refreshToken();
-        return doWithRetry(() => axios.patch(
+        return doWithRetry(() => this.httpClient.exchange(
             `${this.cf.api_url}/v3/apps/${appGuid}/relationships/current_droplet`,
-            { data: { guid: dropletGuid } },
-            { headers: _.assign({}, this.authHeader, this.jsonContentHeader) },
+            {
+                headers: _.assign({}, this.authHeader, this.jsonContentHeader),
+                body: { data: { guid: dropletGuid } },
+                method: HttpMethod.Patch,
+            },
         ), `set current droplet for app ${appGuid}`);
     }
 
@@ -359,19 +394,19 @@ export class CloudFoundryApi {
         this.cf.routes.setToken(newToken);
     }
 
-    private async retryUntilCondition(action: () => Promise<AxiosResponse>,
-                                      successCondition: (r: AxiosResponse) => boolean,
-                                      failureCondition: (r: AxiosResponse) => boolean): Promise<AxiosResponse> {
+    private async retryUntilCondition(action: () => Promise<HttpResponse<any>>,
+                                      successCondition: (r: HttpResponse<any>) => boolean,
+                                      failureCondition: (r: HttpResponse<any>) => boolean): Promise<HttpResponse<any>> {
         const result = await action();
         if (successCondition(result)) {
             return result;
         }
         if (failureCondition(result)) {
-            const error = new Error(JSON.stringify(result.data));
+            const error = new Error(JSON.stringify(result.body));
             error.name = "RetryUntilConditionFailure";
             throw error;
         }
-        await new Promise<AxiosResponse>(res => setTimeout(res, this.retryInterval));
+        await new Promise<HttpResponse<any>>(res => setTimeout(res, this.retryInterval));
         return this.retryUntilCondition(action, successCondition, failureCondition);
     }
 
@@ -383,5 +418,4 @@ export class CloudFoundryApi {
         }
         return +memory;
     }
-
 }

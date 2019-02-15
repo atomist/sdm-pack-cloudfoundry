@@ -25,7 +25,6 @@ import cfClient = require("cf-client");
 import FormData = require("form-data");
 import { ReadStream } from "fs";
 import * as _ from "lodash";
-import request = require("request");
 import { ManifestApplication } from "./CloudFoundryManifest";
 import { CloudFoundryInfo } from "./CloudFoundryTarget";
 
@@ -48,7 +47,7 @@ export async function initializeCloudFoundry(cfi: CloudFoundryInfo): Promise<Clo
     usersUaa.setEndPoint(endpoint.authorization_endpoint);
     const token = await usersUaa.login(cfi.username, cfi.password);
     usersUaa.setToken(token);
-    const cf = {
+    return {
         api_url: cfi.api,
         token,
         usersUaa,
@@ -59,7 +58,6 @@ export async function initializeCloudFoundry(cfi: CloudFoundryInfo): Promise<Clo
         userProvidedServices: new cfClient.UserProvidedServices(cfi.api),
         routes: new cfClient.Routes(cfi.api),
     };
-    return cf;
 }
 
 /**
@@ -118,7 +116,7 @@ export class CloudFoundryApi {
         return this.cf.apps.add({
             "name": manifestApp.name,
             "space_guid": spaceGuid,
-            "memory": this.normalizeManifestMemory(manifestApp.memory),
+            "memory": CloudFoundryApi.normalizeManifestMemory(manifestApp.memory),
             "instances": manifestApp.instances,
             "disk_quota": manifestApp.disk_quota,
             "command": manifestApp.command,
@@ -132,7 +130,7 @@ export class CloudFoundryApi {
     public async updateAppWithManifest(appGuid: string, manifestApp: ManifestApplication): Promise<any> {
         await this.refreshToken();
         return this.cf.apps.update(appGuid, {
-            "memory": this.normalizeManifestMemory(manifestApp.memory),
+            "memory": CloudFoundryApi.normalizeManifestMemory(manifestApp.memory),
             "instances": manifestApp.instances,
             "disk_quota": manifestApp.disk_quota,
             "command": manifestApp.command,
@@ -183,33 +181,30 @@ export class CloudFoundryApi {
                 },
             }, { headers: _.assign({}, this.authHeader, this.jsonContentHeader) }),
             `create package ${appGuid}`);
-        const formData = FormData();
-        formData.maxDataSize = Infinity;
+        const formData = new FormData();
         formData.append("bits", packageFile);
         const uploadHeaders = _.assign({}, this.authHeader, formData.getHeaders());
-        const options = {
-            method: "POST",
-            url: packageCreateResult.data.links.upload.href,
-            headers: uploadHeaders,
-            formData:
-                {
-                    bits: packageFile,
-                },
-        };
-        request(options, (error, response, body) => {
-            if (error) {
-                throw new Error(error);
-            }
-        });
-        return this.retryUntilCondition(
-            async () => {
-                await this.refreshToken();
-                return doWithRetry(() =>
-                        axios.get(packageCreateResult.data.links.self.href, { headers: this.authHeader }),
-                    `get package ${packageCreateResult.data.guid}`);
+        return axios.post(
+            packageCreateResult.data.links.upload.href,
+            formData,
+            {
+                headers: uploadHeaders,
             },
-            r => r.data.state === "READY",
-            r => r.data.state === "FAILED",
+        ).then(() => {
+                return this.retryUntilCondition(
+                    async () => {
+                        await this.refreshToken();
+                        return doWithRetry(() =>
+                                axios.get(packageCreateResult.data.links.self.href, {headers: this.authHeader}),
+                            `get package ${packageCreateResult.data.guid}`);
+                    },
+                    r => r.data.state === "READY",
+                    r => r.data.state === "FAILED",
+                );
+            },
+        ).catch(reason => {
+                throw new Error(reason);
+            },
         );
     }
 
@@ -380,7 +375,7 @@ export class CloudFoundryApi {
         return this.retryUntilCondition(action, successCondition, failureCondition);
     }
 
-    private normalizeManifestMemory(memory: string): number {
+    private static normalizeManifestMemory(memory: string): number {
         if (memory.endsWith("M")) {
             return +memory.replace("M", "");
         } else if (memory.endsWith("G")) {

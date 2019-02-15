@@ -68,12 +68,12 @@ export class CloudFoundryPusher {
         log.write(`Building package for ${appNameForLog}...`);
         // tslint:disable-next-line:no-floating-promises
         log.flush();
-        const buildResult = await this.api.buildDroplet(packageUploadResult.data.guid);
+        const buildResult = await this.api.buildDroplet(packageUploadResult.body.guid);
         const serviceNames = !manifestApp.services ? [] : manifestApp.services;
         const serviceModifications = await this.appServiceModifications(appGuid, serviceNames);
         await this.api.stopApp(appGuid);
         log.write(`Stopped app for updates to ${appNameForLog}.`);
-        await this.api.setCurrentDropletForApp(appGuid, buildResult.data.droplet.guid);
+        await this.api.setCurrentDropletForApp(appGuid, buildResult.body.droplet.guid);
         if (serviceModifications.servicesToAdd.length > 0) {
             const addServiceNames = serviceModifications.servicesToAdd.map(s => s.entity.name);
             log.write(`Adding services ${addServiceNames} to ${appNameForLog}.`);

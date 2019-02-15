@@ -29,6 +29,7 @@
   "types": "./index.d.ts",
   "dependencies": {
     "@atomist/microgrammar": "1.0.1-master.20181109093737",
+    "@atomist/sdm-pack-analysis": "*",
     "@atomist/slack-messages": "1.1.0-master.20181115202354",
     "@types/lodash": "^4.14.116",
     "archiver": "^2.1.1",
@@ -41,19 +42,20 @@
     "request": "^2.87.0"
   },
   "peerDependencies": {
-    "@atomist/automation-client": ">=1.0.1",
-    "@atomist/sdm": ">=1.0.1",
-    "@atomist/sdm-core": ">=1.0.1",
-    "@atomist/sdm-pack-node": ">=1.0.1",
-    "@atomist/sdm-pack-spring": ">=1.0.1"
+    "@atomist/automation-client": ">=1.3.0",
+    "@atomist/sdm-pack-analysis": "0.1.0-master.20190213071419",
+    "@atomist/sdm": ">=1.3.0",
+    "@atomist/sdm-core": ">=1.3.0",
+    "@atomist/sdm-pack-node": ">=1.0.3",
+    "@atomist/sdm-pack-spring": ">=1.1.1"
   },
   "devDependencies": {
-    "@atomist/automation-client": "1.2.0-master.20181217141728",
-    "@atomist/sdm": "1.2.0-master.20181217135326",
-    "@atomist/sdm-core": "1.2.0-master.20181213212357",
-    "@atomist/sdm-pack-build": "1.0.4-master.20181213113653",
-    "@atomist/sdm-pack-node": "1.0.2-master.20181210083206",
-    "@atomist/sdm-pack-spring": "1.1.0-master.20181210133355",
+    "@atomist/automation-client": "1.3.0-master.20190209143849",
+    "@atomist/sdm": "1.3.0-master.20190206205235",
+    "@atomist/sdm-core": "1.3.0-master.20190211113656",
+    "@atomist/sdm-pack-build": "1.0.4-master.20190110123121",
+    "@atomist/sdm-pack-node": "1.0.3-master.20190206103839",
+    "@atomist/sdm-pack-spring": "^1.1.1-master.20190213052312",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.5.7",
     "@types/power-assert": "^1.5.0",

@@ -25,3 +25,7 @@ export {
     CloudFoundryDeploy,
     CloudFoundryDeploymentStrategy,
 } from "./lib/goals/CloudFoundryPushDeploy";
+
+export { cloudFoundryScanner, CloudFoundryStack } from "./lib/stack/cloudFoundryScanner";
+export { CloudFoundryDeployInterpreter } from "./lib/stack/CloudFoundryDeployInterpreter";
+export { CloudFoundryStackSupport } from "./lib/stack/cloudFoundryStackSupport";

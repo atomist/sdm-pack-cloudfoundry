@@ -1,0 +1,274 @@
+<!doctype html>
+<html class="default no-js">
+<head>
+	<meta charset="utf-8">
+	<meta http-equiv="X-UA-Compatible" content="IE=edge">
+	<title>@atomist/sdm-pack-cloudfoundry</title>
+	<meta name="description" content="">
+	<meta name="viewport" content="width=device-width, initial-scale=1">
+	<link rel="stylesheet" href="assets/css/main.css">
+</head>
+<body>
+<header>
+	<div class="tsd-page-toolbar">
+		<div class="container">
+			<div class="table-wrap">
+				<div class="table-cell" id="tsd-search" data-index="assets/js/search.js" data-base=".">
+					<div class="field">
+						<label for="tsd-search-field" class="tsd-widget search no-caption">Search</label>
+						<input id="tsd-search-field" type="text" />
+					</div>
+					<ul class="results">
+						<li class="state loading">Preparing search index...</li>
+						<li class="state failure">The search index is not available</li>
+					</ul>
+					<a href="index.html" class="title">@atomist/sdm-pack-cloudfoundry</a>
+				</div>
+				<div class="table-cell" id="tsd-widgets">
+					<div id="tsd-filter">
+						<a href="#" class="tsd-widget options no-caption" data-toggle="options">Options</a>
+						<div class="tsd-filter-group">
+							<div class="tsd-select" id="tsd-filter-visibility">
+								<span class="tsd-select-label">All</span>
+								<ul class="tsd-select-list">
+									<li data-value="public">Public</li>
+									<li data-value="protected">Public/Protected</li>
+									<li data-value="private" class="selected">All</li>
+								</ul>
+							</div>
+							<input type="checkbox" id="tsd-filter-inherited" checked />
+							<label class="tsd-widget" for="tsd-filter-inherited">Inherited</label>
+							<input type="checkbox" id="tsd-filter-only-exported" />
+							<label class="tsd-widget" for="tsd-filter-only-exported">Only exported</label>
+						</div>
+					</div>
+					<a href="#" class="tsd-widget menu no-caption" data-toggle="menu">Menu</a>
+				</div>
+			</div>
+		</div>
+	</div>
+	<div class="tsd-page-title">
+		<div class="container">
+			<ul class="tsd-breadcrumb">
+				<li>
+					<a href="globals.html">Globals</a>
+				</li>
+			</ul>
+			<h1> @atomist/sdm-pack-cloudfoundry</h1>
+		</div>
+	</div>
+</header>
+<div class="container container-main">
+	<div class="row">
+		<div class="col-8 col-content">
+			<div class="tsd-panel tsd-typography">
+				<h1 id="-atomist-sdm-pack-cloudfoundry">@atomist/sdm-pack-cloudfoundry</h1>
+				<p><a href="https://app.atomist.com/workspace/T29E48P34"><img src="http://badge.atomist.com/T29E48P34/atomist/sdm-pack-cloudfoundry/067b98ed-775a-4d34-a4a3-82837feca109" alt="atomist sdm goals"></a>
+				<a href="https://www.npmjs.com/package/@atomist/sdm-pack-cloudfoundry"><img src="https://img.shields.io/npm/v/@atomist/sdm-pack-cloudfoundry.svg" alt="npm version"></a></p>
+				<p><a href="https://atomist.com/" title="Atomist - How Teams Deliver Software">Atomist</a> software delivery machine (SDM) extension pack for
+					an Atomist SDM to deploy to <a href="https://www.cloudfoundry.org/" title="Cloud Foundry">Cloud Foundry</a>.  These capabilities
+				will work for both open source and Pivotal Cloud Foundry.</p>
+				<p>See the <a href="https://docs.atomist.com/" title="Atomist Documentation">Atomist documentation</a> for more information on
+					what SDMs are and what they can do for you using the Atomist API for
+				software.</p>
+				<h2 id="usage">Usage</h2>
+				<p>Install the dependency in your SDM project.</p>
+				<pre><code>$ <span class="hljs-built_in">npm</span> install @atomist/sdm-pack-cloudfoundry</code></pre><p>Then use its exported method to add the functionality to your SDM in
+				your machine definition.</p>
+				<pre><code class="language-typescript"><span class="hljs-keyword">import</span> {
+    SoftwareDeliveryMachine,
+    SoftwareDeliveryMachineConfiguration,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">"@atomist/sdm"</span>;
+<span class="hljs-keyword">import</span> {
+    createSoftwareDeliveryMachine,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">"@atomist/sdm-core"</span>;
+<span class="hljs-keyword">import</span> {
+    CloudFoundrySupport,
+} <span class="hljs-keyword">from</span> <span class="hljs-string">"@atomist/sdm-pack-cloudfoundry"</span>;
+
+<span class="hljs-keyword">export</span> <span class="hljs-function"><span class="hljs-keyword">function</span> <span class="hljs-title">machine</span>(<span class="hljs-params">configuration: SoftwareDeliveryMachineConfiguration</span>): <span class="hljs-title">SoftwareDeliveryMachine</span> </span>{
+    <span class="hljs-keyword">const</span> sdm = createSoftwareDeliveryMachine({
+        name: <span class="hljs-string">"My Software Delivery Machine"</span>,
+        configuration,
+    });
+    sdm.addExtensionPacks(SeedSupport);
+    sdm.addDeployRules(
+        deploy.when(IsMaven)
+            .deployTo(ProductionDeploymentGoal, ProductionEndpointGoal, ProductionUndeploymentGoal)
+            .using({
+                deployer: <span class="hljs-keyword">new</span> CloudFoundryBlueGreenDeployer(configuration.sdm.projectLoader),
+                targeter: <span class="hljs-function"><span class="hljs-params">()</span> =&gt;</span> <span class="hljs-keyword">new</span> EnvironmentCloudFoundryTarget(<span class="hljs-string">"production"</span>),
+            }),
+    );
+    <span class="hljs-keyword">return</span> sdm;
+};</code></pre>
+				<p>Finally, add the required configuration values to your client
+				configuration.</p>
+				<pre><code class="language-json">{
+  <span class="hljs-attr">"sdm"</span>: {
+    <span class="hljs-attr">"cloudfoundry"</span>: {
+      <span class="hljs-attr">"user"</span>: <span class="hljs-string">"cf-user@atomist.com"</span>,
+      <span class="hljs-attr">"password"</span>: <span class="hljs-string">"cFpAsSw0rD"</span>,
+      <span class="hljs-attr">"org"</span>: <span class="hljs-string">"cf-organiation"</span>,
+      <span class="hljs-attr">"spaces"</span>: {
+        <span class="hljs-attr">"staging"</span>: <span class="hljs-string">"cf-staging-space"</span>,
+        <span class="hljs-attr">"production"</span>: <span class="hljs-string">"cf-production-space"</span>
+      }
+    }
+  }
+}</code></pre>
+				<h2 id="support">Support</h2>
+				<p>General support questions should be discussed in the <code>#support</code>
+				channel in the <a href="https://join.atomist.com/" title="Atomist Community Slack">Atomist community Slack workspace</a>.</p>
+				<p>If you find a problem, please create an <a href="https://github.com/atomist/sdm-pack-cloudfoundry/issues">issue</a>.</p>
+				<h2 id="development">Development</h2>
+				<p>You will need to install <a href="https://nodejs.org/" title="Node.js">Node.js</a> to build and test this
+				project.</p>
+				<h3 id="build-and-test">Build and test</h3>
+				<p>Install dependencies.</p>
+				<pre><code>$ npm <span class="hljs-keyword">install</span></code></pre><p>Use the <code>build</code> package script to compile, test, lint, and build the
+				documentation.</p>
+				<pre><code>$ npm <span class="hljs-keyword">run</span><span class="bash"> build</span></code></pre><h3 id="release">Release</h3>
+				<p>Releases are handled via the <a href="https://github.com/atomist/atomist-sdm" title="Atomist Software Delivery Machine">Atomist SDM</a>.  Just press
+				the &#39;Approve&#39; button in the Atomist dashboard or Slack.</p>
+				<hr>
+				<p>Created by <a href="https://atomist.com/" title="Atomist - How Teams Deliver Software">Atomist</a>.
+				Need Help?  <a href="https://join.atomist.com/" title="Atomist Community Slack">Join our Slack workspace</a>.</p>
+			</div>
+		</div>
+		<div class="col-4 col-menu menu-sticky-wrap menu-highlight">
+			<nav class="tsd-navigation primary">
+				<ul>
+					<li class="globals  ">
+						<a href="globals.html"><em>Globals</em></a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_index_.html">"index"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_cloudfoundrysupport_.html">"lib/<wbr>Cloud<wbr>Foundry<wbr>Support"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_api_cloudfoundryapi_.html">"lib/api/<wbr>Cloud<wbr>Foundry<wbr>Api"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_api_cloudfoundrymanifest_.html">"lib/api/<wbr>Cloud<wbr>Foundry<wbr>Manifest"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_api_cloudfoundrytarget_.html">"lib/api/<wbr>Cloud<wbr>Foundry<wbr>Target"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_cli_commandlinecloudfoundrydeployer_.html">"lib/cli/<wbr>Command<wbr>Line<wbr>Cloud<wbr>Foundry<wbr>Deployer"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_cli_cloudfoundrylogparser_.html">"lib/cli/cloud<wbr>Foundry<wbr>Log<wbr>Parser"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_config_environmentcloudfoundrytarget_.html">"lib/config/<wbr>Environment<wbr>Cloud<wbr>Foundry<wbr>Target"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_config_cloudfoundrymanifestpushtest_.html">"lib/config/cloud<wbr>Foundry<wbr>Manifest<wbr>Push<wbr>Test"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_goals_cloudfoundrypushdeploy_.html">"lib/goals/<wbr>Cloud<wbr>Foundry<wbr>Push<wbr>Deploy"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_handlers_addcloudfoundrymanifest_.html">"lib/handlers/add<wbr>Cloud<wbr>Foundry<wbr>Manifest"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_listeners_enabledeployoncloudfoundrymanifestaddition_.html">"lib/listeners/enable<wbr>Deploy<wbr>OnCloud<wbr>Foundry<wbr>Manifest<wbr>Addition"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_listeners_suggestaddingcloudfoundrymanifest_.html">"lib/listeners/suggest<wbr>Adding<wbr>Cloud<wbr>Foundry<wbr>Manifest"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_push_cloudfoundrybluegreendeployer_.html">"lib/push/<wbr>Cloud<wbr>Foundry<wbr>Blue<wbr>Green<wbr>Deployer"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_push_cloudfoundrybluegreener_.html">"lib/push/<wbr>Cloud<wbr>Foundry<wbr>Blue<wbr>Greener"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_push_cloudfoundrypushdeployer_.html">"lib/push/<wbr>Cloud<wbr>Foundry<wbr>Push<wbr>Deployer"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_push_cloudfoundrypusher_.html">"lib/push/<wbr>Cloud<wbr>Foundry<wbr>Pusher"</a>
+					</li>
+					<li class=" tsd-kind-external-module">
+						<a href="modules/_lib_push_projectarchiver_.html">"lib/push/<wbr>Project<wbr>Archiver"</a>
+					</li>
+				</ul>
+			</nav>
+			<nav class="tsd-navigation secondary menu-sticky">
+				<ul class="before-current">
+				</ul>
+			</nav>
+		</div>
+	</div>
+</div>
+<footer class="with-border-bottom">
+	<div class="container">
+		<h2>Legend</h2>
+		<div class="tsd-legend-group">
+			<ul class="tsd-legend">
+				<li class="tsd-kind-module"><span class="tsd-kind-icon">Module</span></li>
+				<li class="tsd-kind-object-literal"><span class="tsd-kind-icon">Object literal</span></li>
+				<li class="tsd-kind-variable"><span class="tsd-kind-icon">Variable</span></li>
+				<li class="tsd-kind-function"><span class="tsd-kind-icon">Function</span></li>
+				<li class="tsd-kind-function tsd-has-type-parameter"><span class="tsd-kind-icon">Function with type parameter</span></li>
+				<li class="tsd-kind-index-signature"><span class="tsd-kind-icon">Index signature</span></li>
+				<li class="tsd-kind-type-alias"><span class="tsd-kind-icon">Type alias</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-enum"><span class="tsd-kind-icon">Enumeration</span></li>
+				<li class="tsd-kind-enum-member"><span class="tsd-kind-icon">Enumeration member</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-enum"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-enum"><span class="tsd-kind-icon">Method</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-interface"><span class="tsd-kind-icon">Interface</span></li>
+				<li class="tsd-kind-interface tsd-has-type-parameter"><span class="tsd-kind-icon">Interface with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-interface"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-interface"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-interface"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-interface"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-class"><span class="tsd-kind-icon">Class</span></li>
+				<li class="tsd-kind-class tsd-has-type-parameter"><span class="tsd-kind-icon">Class with type parameter</span></li>
+				<li class="tsd-kind-constructor tsd-parent-kind-class"><span class="tsd-kind-icon">Constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class"><span class="tsd-kind-icon">Property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class"><span class="tsd-kind-icon">Method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class"><span class="tsd-kind-icon">Accessor</span></li>
+				<li class="tsd-kind-index-signature tsd-parent-kind-class"><span class="tsd-kind-icon">Index signature</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-constructor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited constructor</span></li>
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-inherited"><span class="tsd-kind-icon">Inherited accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-protected"><span class="tsd-kind-icon">Protected accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private property</span></li>
+				<li class="tsd-kind-method tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private method</span></li>
+				<li class="tsd-kind-accessor tsd-parent-kind-class tsd-is-private"><span class="tsd-kind-icon">Private accessor</span></li>
+			</ul>
+			<ul class="tsd-legend">
+				<li class="tsd-kind-property tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static property</span></li>
+				<li class="tsd-kind-call-signature tsd-parent-kind-class tsd-is-static"><span class="tsd-kind-icon">Static method</span></li>
+			</ul>
+		</div>
+	</div>
+</footer>
+<div class="container tsd-generator">
+	<p>Generated using <a href="http://typedoc.org/" target="_blank">TypeDoc</a></p>
+</div>
+<div class="overlay"></div>
+<script src="assets/js/main.js"></script>
+<script>if (location.protocol == 'file:') document.write('<script src="assets/js/search.js"><' + '/script>');</script>
+</body>
+</html>

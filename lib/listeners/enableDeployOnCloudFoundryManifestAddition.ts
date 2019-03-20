@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -44,6 +44,9 @@ export function enableDeployOnCloudFoundryManifestAdditionListener(
                 credentials: pil.credentials,
                 addressChannels: pil.addressChannels,
                 ids: [pil.id],
+                configuration: pil.configuration,
+                preferences: pil.preferences,
+                promptFor: () => Promise.resolve(undefined),
             }, true);
         }
     };

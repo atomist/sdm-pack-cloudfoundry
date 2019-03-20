@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -22,7 +22,7 @@ import {
 } from "@atomist/automation-client";
 import axios, { AxiosResponse } from "axios";
 import cfClient = require("cf-client");
-import FormData = require("form-data");
+import * as FormData from "form-data";
 import { ReadStream } from "fs";
 import * as _ from "lodash";
 import request = require("request");
@@ -183,9 +183,7 @@ export class CloudFoundryApi {
                 },
             }, { headers: _.assign({}, this.authHeader, this.jsonContentHeader) }),
             `create package ${appGuid}`);
-        const formData = FormData();
-        formData.maxDataSize = Infinity;
-        formData.append("bits", packageFile);
+        const formData = new FormData();
         const uploadHeaders = _.assign({}, this.authHeader, formData.getHeaders());
         const options = {
             method: "POST",

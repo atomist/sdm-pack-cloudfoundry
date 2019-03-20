@@ -44,6 +44,9 @@ export function enableDeployOnCloudFoundryManifestAdditionListener(
                 credentials: pil.credentials,
                 addressChannels: pil.addressChannels,
                 ids: [pil.id],
+                configuration: pil.configuration,
+                preferences: pil.preferences,
+                promptFor: () => Promise.resolve(undefined),
             }, true);
         }
     };

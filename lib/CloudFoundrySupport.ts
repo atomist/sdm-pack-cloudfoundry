@@ -15,34 +15,12 @@
  */
 
 import {
-    AutoCodeInspection,
     ExtensionPack,
     metadata,
-    PushImpact,
-    ReviewListenerRegistration,
 } from "@atomist/sdm";
+import { AddCloudFoundryManifest } from "./handlers/addCloudFoundryManifest";
 
-export interface CloudFoundrySupportOptions {
-
-    /**
-     * Inspect goal to add inspections to.
-     * Review functionality won't work otherwise.
-     */
-    inspectGoal?: AutoCodeInspection;
-
-    /**
-     * Autofix goal to add autofixes to.
-     * Autofix functionality won't work otherwise.
-     */
-    pushImpactGoal?: PushImpact;
-
-    /**
-     * Review listeners that let you publish review results.
-     */
-    reviewListeners?: ReviewListenerRegistration | ReviewListenerRegistration[];
-}
-
-export function CloudFoundrySupport(options: CloudFoundrySupportOptions): ExtensionPack {
+export function cloudFoundrySupport(): ExtensionPack {
 
     return {
         ...metadata("cloud-foundry"),
@@ -53,25 +31,9 @@ export function CloudFoundrySupport(options: CloudFoundrySupportOptions): Extens
             "sdm.cloudfoundry.spaces.production",
             "sdm.cloudfoundry.spaces.staging",
         ],
-        configure: () => {  return; },
-        // configure: sdm => {
-        //     sdm
-        //         .addCodeTransformCommand(AddCloudFoundryManifest)
-        //         .addChannelLinkListener(SuggestAddingCloudFoundryManifest)
-        //         .addFirstPushListener(
-        //             suggestAddingCloudFoundryManifestOnNewRepo(sdm.configuration.sdm.projectLoader));
-        //
-        //     if (!!options.inspectGoal) {
-        //         if (options.reviewListeners) {
-        //             const listeners = Array.isArray(options.reviewListeners) ?
-        //                 options.reviewListeners : [options.reviewListeners];
-        //             listeners.forEach(l => options.inspectGoal.withListener(l));
-        //         }
-        //     }
-        //     if (!!options.pushImpactGoal) {
-        //         options.pushImpactGoal
-        //             .with(enableDeployOnCloudFoundryManifestAddition(sdm));
-        //     }
-        // },
+        configure: sdm => {
+            sdm
+                .addCodeTransformCommand(AddCloudFoundryManifest);
+        },
     };
 }

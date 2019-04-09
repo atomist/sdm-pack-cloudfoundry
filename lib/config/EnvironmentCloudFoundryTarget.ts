@@ -44,7 +44,7 @@ export interface CloudFoundryDeployment extends Deployment {
  * Configure cloud foundry from environment variables.
  * See README for definition.
  */
-export class EnvironmentCloudFoundryTarget {
+export class EnvironmentCloudFoundryTarget implements CloudFoundryInfo {
 
     public api: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").api || "https://api.run.pivotal.io";
 

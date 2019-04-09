@@ -90,7 +90,7 @@ export class CommandLineCloudFoundryDeployer implements CloudFoundryDeployer {
         const subDomain = subDomainCreator(id);
         await deployToCloudFoundry(id, project, manifestFile, cfi, subDomain, deployableArtifactPath, log);
         return [{
-            endpoint: `${subDomain}.${cfi.domain}`,
+            endpoint: `http://${subDomain}.${cfi.domain}`,
             appName: id.repo,
         }];
     }

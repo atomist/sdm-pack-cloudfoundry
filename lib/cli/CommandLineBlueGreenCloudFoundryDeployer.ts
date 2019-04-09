@@ -57,7 +57,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
         // Note: if the password is wrong, things hangs forever waiting for input.
         await spawnLog(
             "cf",
-            ["login", `-a`, `${cfi.api}`, `-o`, `${cfi.org}`, `-u`, `${cfi.username}`, `-p`,  `'${cfi.password}'`, `-s`, `${cfi.space}`],
+            ["login", `-a`, `${cfi.api}`, `-o`, `${cfi.org}`, `-u`, `${cfi.username}`, `-p`,  `${cfi.password}`, `-s`, `${cfi.space}`],
             {cwd: project.baseDir, log});
         logger.debug("Successfully selected space [%s]", cfi.space);
         // Turn off color so we don't have unpleasant escape codes in stream
@@ -77,7 +77,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
             await this.deployToCloudFoundry(id, project, manifestFile, cfi, subDomain, deployableArtifactPath, log);
         }
         return [{
-            endpoint: `${subDomain}.${cfi.domain}`,
+            endpoint: `http://${subDomain}.${cfi.domain}`,
             appName: id.repo,
         }];
     }

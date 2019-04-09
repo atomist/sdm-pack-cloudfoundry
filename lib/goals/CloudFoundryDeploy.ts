@@ -32,6 +32,9 @@ import {
     GoalInvocation,
     ImplementationRegistration,
     IndependentOfEnvironment,
+    ProgressTest,
+    ReportProgress,
+    testProgressReporter,
 } from "@atomist/sdm";
 import * as _ from "lodash";
 import { CommandLineBlueGreenCloudFoundryDeployer } from "../cli/CommandLineBlueGreenCloudFoundryDeployer";
@@ -68,6 +71,9 @@ const CloudFoundryGoalDefinition: GoalDefinition = {
     isolated: true,
 };
 
+/**
+ * Deploys an application to CloudFoundry.
+ */
 export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFoundryDeploymentRegistration> {
     // tslint:disable-next-line
     constructor(protected details: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("cf-deploy-push"),
@@ -83,11 +89,46 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
         this.addFulfillment({
             name: DefaultGoalNameGenerator.generateName("cf-deployer"),
             goalExecutor: executeCloudFoundryDeployment(registration),
+            progressReporter: CloudFoundryDeployProgressReporter,
             ...registration,
         });
         return this;
     }
 }
+
+const CloudFoundryProgressTests: ProgressTest[] = [{
+    test: /---progress:deploying/i,
+    phase: "deploying",
+}, {
+    test: /---progress:startbluegreen/i,
+    phase: "starting blue-green",
+}, {
+    test: /---progress:greendeploying/i,
+    phase: "deploying green",
+}, {
+    test: /---progress:mapgreentoblue]/i,
+    phase: "mapping green -> blue",
+}, , {
+    test: /---progress:unmapbluetoblue]/i,
+    phase: "unmapping blue -> blue",
+}, {
+    test: /---progress:unmapgreentogreen]/i,
+    phase: "unmaping green -> green",
+}, {
+    test: /---progress:deleteblue]/i,
+    phase: "deleting blue",
+}, {
+    test: /---progress:renaminggreentoblue]/i,
+    phase: "renaming green -> blue",
+}, {
+    test: /---progress:complete]/i,
+    phase: "deployment complete",
+}];
+
+/**
+ * ReportProgress for our CloudFoundry deployments
+ */
+const CloudFoundryDeployProgressReporter: ReportProgress = testProgressReporter(...CloudFoundryProgressTests);
 
 function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegistration): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {

@@ -37,6 +37,7 @@ async function deployToCloudFoundry(id: RemoteRepoRef,
                                     subDomain: string,
                                     deployableArtifactPath: string,
                                     log: ProgressLog): Promise<any> {
+    log.write("---progress:deploying\n");
     const cfArguments = [
         "push",
         id.repo,
@@ -66,11 +67,6 @@ export class CommandLineCloudFoundryDeployer implements CloudFoundryDeployer {
                         credentials: ProjectOperationCredentials,
                         subDomainCreator: (id: RemoteRepoRef) => string,
                         deployableArtifactPath?: string): Promise<CloudFoundryDeployment[]> {
-        logger.info("Deploying app [%j] to Cloud Foundry [%s]", id.repo, cfi.description);
-
-        // We need the Cloud Foundry manifest. If it's not found, we can't deploy
-        // We want a fresh version unless we need it build
-
         const manifestFile = (await project.findFile("manifest.yaml")).path;
 
         if (!cfi.api || !cfi.org || !cfi.username || !cfi.password) {
@@ -83,7 +79,6 @@ export class CommandLineCloudFoundryDeployer implements CloudFoundryDeployer {
             ["login", `-a`, `${cfi.api}`, `-o`, `${cfi.org}`, `-u`, `${cfi.username}`, `-p`,  `${cfi.password}`, `-s`, `${cfi.space}`],
             {cwd: project.baseDir, log});
         logger.debug("Successfully selected space [%s]", cfi.space);
-        // Turn off color so we don't have unpleasant escape codes in stream
         await spawnLog(`cf`,
             ["config", "--color", "false"],
             {cwd: project.baseDir, log});

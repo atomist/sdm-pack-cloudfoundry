@@ -14,11 +14,14 @@
  * limitations under the License.
  */
 
-import { logger } from "@atomist/automation-client";
+import {
+    LocalProject,
+    logger,
+    RemoteRepoRef,
+} from "@atomist/automation-client";
 import {
     checkOutArtifact,
     DefaultGoalNameGenerator,
-    Deployer,
     ExecuteGoal,
     ExecuteGoalResult,
     FulfillableGoalDetails,
@@ -31,10 +34,10 @@ import {
     IndependentOfEnvironment,
 } from "@atomist/sdm";
 import * as _ from "lodash";
+import { CommandLineBlueGreenCloudFoundryDeployer } from "../cli/CommandLineBlueGreenCloudFoundryDeployer";
 import { CommandLineCloudFoundryDeployer } from "../cli/CommandLineCloudFoundryDeployer";
+import { CloudFoundryDeployer } from "../CloudFoundryDeployer";
 import { EnvironmentCloudFoundryTarget } from "../config/EnvironmentCloudFoundryTarget";
-import { CloudFoundryBlueGreenDeployer } from "../push/CloudFoundryBlueGreenDeployer";
-import { CloudFoundryPushDeployer } from "../push/CloudFoundryPushDeployer";
 
 /**
  * Register a deployment for a certain type of push
@@ -42,12 +45,13 @@ import { CloudFoundryPushDeployer } from "../push/CloudFoundryPushDeployer";
 export interface CloudFoundryDeploymentRegistration extends Partial<ImplementationRegistration> {
     environment: ("staging" | "production");
     strategy: CloudFoundryDeploymentStrategy;
+    deployableArtifactLocator?: (p: LocalProject) => Promise<string>;
+    subDomainCreator: (id: RemoteRepoRef) => string;
 }
 
 export enum CloudFoundryDeploymentStrategy {
     BLUE_GREEN,
-    API,
-    CLI,
+    STANDARD,
 }
 
 const CloudFoundryGoalDefinition: GoalDefinition = {
@@ -61,11 +65,9 @@ const CloudFoundryGoalDefinition: GoalDefinition = {
     waitingForPreApprovalDescription: "Waiting to start Cloud Foundry deployment",
     stoppedDescription: "Deployment to Cloud Foundry stopped",
     canceledDescription: "Deployment to Cloud Foundry cancelled",
+    isolated: true,
 };
 
-/**
- * Goal to deploy to Cloud Foundry. This uses blue/green deployment.
- */
 export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFoundryDeploymentRegistration> {
     // tslint:disable-next-line
     constructor(protected details: FulfillableGoalDetails | string = DefaultGoalNameGenerator.generateName("cf-deploy-push"),
@@ -89,8 +91,7 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
 
 function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegistration): ExecuteGoal {
     return async (goalInvocation: GoalInvocation): Promise<ExecuteGoalResult> => {
-        const { sdmGoal, credentials, id, context, progressLog, configuration } = goalInvocation;
-        const atomistTeam = context.workspaceId;
+        const { sdmGoal, credentials, id, progressLog, configuration } = goalInvocation;
 
         logger.info("Deploying project %s:%s to CloudFoundry in %s]", id.owner, id.repo, registration.environment);
 
@@ -99,33 +100,34 @@ function executeCloudFoundryDeployment(registration: CloudFoundryDeploymentRegis
 
         artifactCheckout.id.branch = sdmGoal.branch;
 
-        let deployer: Deployer;
+        let deployer: CloudFoundryDeployer;
         switch (registration.strategy) {
+            case CloudFoundryDeploymentStrategy.STANDARD:
+                deployer = new CommandLineCloudFoundryDeployer();
+                break;
             case CloudFoundryDeploymentStrategy.BLUE_GREEN:
-                deployer = new CloudFoundryBlueGreenDeployer(configuration.sdm.projectLoader);
-                break;
-            case CloudFoundryDeploymentStrategy.API:
-                deployer = new CloudFoundryPushDeployer(configuration.sdm.projectLoader);
-                break;
-            case CloudFoundryDeploymentStrategy.CLI:
-                deployer = new CommandLineCloudFoundryDeployer(configuration.sdm.projectLoader);
+                deployer = new CommandLineBlueGreenCloudFoundryDeployer();
                 break;
         }
+        const projectLoader = configuration.sdm.projectLoader;
+        return projectLoader.doWithProject({ credentials, id, readOnly: true }, async project => {
+            const deployments = await deployer.deploy(
+                project,
+                id,
+                new EnvironmentCloudFoundryTarget(registration.environment),
+                progressLog,
+                credentials,
+                registration.subDomainCreator,
+                await registration.deployableArtifactLocator(project));
 
-        const deployments = await deployer.deploy(
-            artifactCheckout,
-            new EnvironmentCloudFoundryTarget(registration.environment),
-            progressLog,
-            credentials,
-            atomistTeam);
+            const results = await Promise.all(deployments.map(deployment => {
+                return {
+                    code: 0,
+                    targetUrl: deployment.endpoint,
+                };
+            }));
 
-        const results = await Promise.all(deployments.map(deployment => {
-            return {
-                code: 0,
-                targetUrl: deployment.endpoint,
-            };
-        }));
-
-        return _.head(results);
+            return _.head(results);
+        });
     };
 }

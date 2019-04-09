@@ -27,7 +27,6 @@ import {
     HasSpringBootPom,
     MavenProjectIdentifier,
 } from "@atomist/sdm-pack-spring";
-import { CloudFoundryManifestPath } from "../api/CloudFoundryTarget";
 
 export const AddCloudFoundryManifestMarker = "[atomist:add-pcf-manifest]";
 
@@ -40,13 +39,13 @@ export const AtomistConfigTsPath = "src/atomist.config.ts";
 export const addCloudFoundryManifestTransform: CodeTransform = async (p, ctx) => {
     const javaId = await MavenProjectIdentifier(p);
     if (javaId && await HasSpringBootPom.predicate(p)) {
-        return p.addFile(CloudFoundryManifestPath, javaManifestFor(javaId.artifact, ctx.context.workspaceId));
+        return p.addFile("manifest.yaml", javaManifestFor(javaId.artifact, ctx.context.workspaceId));
     }
     const nodeId = await NodeProjectIdentifier(p);
     if (nodeId) {
         const isAutomationClient = !!await p.getFile(AtomistConfigTsPath);
         logger.info(`addCloudFoundryManifestEditor: Node project %j: automation client=${isAutomationClient}`, p.id);
-        return p.addFile(CloudFoundryManifestPath,
+        return p.addFile("manifest.yaml",
             isAutomationClient ?
                 automationClientManifestFor(nodeId.name, ctx.context.workspaceId) :
                 nodeManifestFor(nodeId.name, ctx.context.workspaceId))

@@ -15,125 +15,83 @@
  */
 
 import {
-    asSpawnCommand,
-    execIn,
+    LocalProject,
     logger,
     ProjectOperationCredentials,
     RemoteRepoRef,
-    SpawnCommand,
-    stringifySpawnCommand,
 } from "@atomist/automation-client";
 import {
     DelimitedWriteProgressLogDecorator,
-    DeployableArtifact,
-    Deployer,
     ProgressLog,
-    ProjectLoader,
-    spawnAndWatch,
+    spawnLog,
 } from "@atomist/sdm";
-import { spawn } from "child_process";
+import { CloudFoundryDeployer } from "../CloudFoundryDeployer";
 import {
     CloudFoundryDeployment,
     CloudFoundryInfo,
-    CloudFoundryManifestPath,
-} from "../api/CloudFoundryTarget";
-import { parseCloudFoundryLogForEndpoint } from "./cloudFoundryLogParser";
+} from "../config/EnvironmentCloudFoundryTarget";
 
 /**
  * Spawn a new process to use the Cloud Foundry CLI to push.
  * Note that this isn't thread safe concerning multiple logins or spaces.
  */
-export class CommandLineCloudFoundryDeployer implements Deployer<CloudFoundryInfo, CloudFoundryDeployment> {
-
-    constructor(private readonly projectLoader: ProjectLoader) {
-    }
-
-    public async deploy(da: DeployableArtifact,
+export class CommandLineCloudFoundryDeployer implements CloudFoundryDeployer {
+    public async deploy(project: LocalProject,
+                        id: RemoteRepoRef,
                         cfi: CloudFoundryInfo,
                         log: ProgressLog,
-                        credentials: ProjectOperationCredentials): Promise<CloudFoundryDeployment[]> {
-        logger.info("Deploying app [%j] to Cloud Foundry [%s]", da, cfi.description);
+                        credentials: ProjectOperationCredentials,
+                        subDomainCreator: (id: RemoteRepoRef) => string,
+                        deployableArtifactPath?: string): Promise<CloudFoundryDeployment[]> {
+        logger.info("Deploying app [%j] to Cloud Foundry [%s]", id.repo, cfi.description);
 
         // We need the Cloud Foundry manifest. If it's not found, we can't deploy
         // We want a fresh version unless we need it build
-        return this.projectLoader.doWithProject({ credentials, id: da.id, readOnly: !da.cwd }, async project => {
-            const manifestFile = await project.findFile(CloudFoundryManifestPath);
 
-            if (!cfi.api || !cfi.org || !cfi.username || !cfi.password) {
-                throw new Error("Cloud foundry authentication information missing. See CloudFoundryTarget.ts");
-            }
+        const manifestFile = await project.findFile("manifest.yaml");
 
-            const opts = {};
+        if (!cfi.api || !cfi.org || !cfi.username || !cfi.password) {
+            throw new Error("Cloud foundry authentication information missing. See CloudFoundryTarget.ts");
+        }
 
-            // Note: if the password is wrong, things hangs forever waiting for input.
-            await execIn(
-                !!da.cwd ? da.cwd : project.baseDir,
-                `cf login`,
-                [`-a ${cfi.api}`, `-o ${cfi.org}`, `-u ${cfi.username}`, `-p '${cfi.password}'`, `-s ${cfi.space}`]);
-            logger.debug("Successfully selected space [%s]", cfi.space);
-            // Turn off color so we don't have unpleasant escape codes in stream
-            await execIn(da.cwd, `cf config`, ["--color false"]);
-            const spawnCommand: SpawnCommand = {
-                command: "cf",
-                args: [
-                    "push",
-                    da.name,
-                    "-f",
-                    project.baseDir + "/" + manifestFile.path,
-                    "--random-route"]
-                    .concat(
-                        !!da.filename ?
-                            ["-p",
-                                da.filename] :
-                            []),
-            };
+        // Note: if the password is wrong, things hangs forever waiting for input.
+        await spawnLog(
+            "cf",
+            ["login", `-a`, `${cfi.api}`, `-o`, `${cfi.org}`, `-u`, `${cfi.username}`, `-p`,  `'${cfi.password}'`, `-s`, `${cfi.space}`],
+            {cwd: project.baseDir, log});
+        logger.debug("Successfully selected space [%s]", cfi.space);
+        // Turn off color so we don't have unpleasant escape codes in stream
+        await spawnLog(`cf`,
+            ["config", "--color", "false"],
+            {cwd: project.baseDir, log});
+        const subDomain = subDomainCreator(id);
+        const cfArguments =  [
+            "push",
+            id.repo,
+            "-f",
+            project.baseDir + "/" + manifestFile.path,
+            "-d",
+            cfi.domain,
+            "-n",
+            subDomain]
+            .concat(
+                !!deployableArtifactPath ?
+                    ["-p",
+                        deployableArtifactPath] :
+                    []);
 
-            logger.info("About to issue Cloud Foundry command %s: options=%j",
-                stringifySpawnCommand(spawnCommand), opts);
-            const childProcess = spawn(spawnCommand.command, spawnCommand.args, opts);
-            const newLineDelimitedLog = new DelimitedWriteProgressLogDecorator(log, "\n");
-            childProcess.stdout.on("data", what => newLineDelimitedLog.write(what.toString()));
-            childProcess.stderr.on("data", what => newLineDelimitedLog.write(what.toString()));
-            return [await new Promise<CloudFoundryDeployment>((resolve, reject) => {
-                childProcess.addListener("exit", (code, signal) => {
-                    if (code !== 0) {
-                        reject(`Error: code ${code}`);
-                    }
-                    resolve({
-                        endpoint: parseCloudFoundryLogForEndpoint(log.log),
-                        appName: da.name,
-                    });
+        const newLineDelimitedLog = new DelimitedWriteProgressLogDecorator(log, "\n");
+        const childProcess = spawnLog("cf", cfArguments, {log: newLineDelimitedLog});
+        return [await new Promise<CloudFoundryDeployment>((resolve, reject) => {
+            childProcess.then(result => {
+                if (result.code !== 0) {
+                    reject(`Error: code ${result.code}`);
+                }
+                resolve({
+                    endpoint: `${subDomain}.${cfi.domain}`,
+                    appName: id.repo,
                 });
-                childProcess.addListener("error", reject);
-            })];
-        });
+            }).catch(reject);
+        })];
     }
-
-    public async findDeployments(id: RemoteRepoRef,
-                                 ti: CloudFoundryInfo,
-                                 credentials: ProjectOperationCredentials): Promise<CloudFoundryDeployment[]> {
-        logger.warn("Find Deployments is not implemented in CommandLineCloudFoundryDeployer." +
-            " You should probably use the CloudFoundryBlueGreenDeployer anyway.");
-        return [];
-    }
-
-    public async undeploy(
-        cfi: CloudFoundryInfo,
-        deployment: CloudFoundryDeployment,
-        log: ProgressLog): Promise<void> {
-        await spawnAndWatch(asSpawnCommand(
-            `cf login -a ${cfi.api} -o ${cfi.org} -u ${cfi.username} -p '${cfi.password}' -s ${cfi.space}`),
-            {}, log);
-
-        await spawnAndWatch(asSpawnCommand(`cf delete ${deployment.appName}`), {}, log);
-        return;
-    }
-
-    public logInterpreter(log: string): any {
-        return {
-            relevantPart: "",
-            message: "Deploy failed",
-        };
-    }
-
 }

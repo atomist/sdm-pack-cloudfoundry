@@ -15,13 +15,16 @@
  */
 
 export { CloudFoundrySupport } from "./lib/CloudFoundrySupport";
-export { CloudFoundryBlueGreenDeployer } from "./lib/push/CloudFoundryBlueGreenDeployer";
-export { CloudFoundryPushDeployer } from "./lib/push/CloudFoundryPushDeployer";
 export { CommandLineCloudFoundryDeployer } from "./lib/cli/CommandLineCloudFoundryDeployer";
-export { CloudFoundryInfo } from "./lib/api/CloudFoundryTarget";
-export { EnvironmentCloudFoundryTarget } from "./lib/config/EnvironmentCloudFoundryTarget";
+export { CommandLineBlueGreenCloudFoundryDeployer } from "./lib/cli/CommandLineBlueGreenCloudFoundryDeployer";
+export {
+    EnvironmentCloudFoundryTarget,
+    CloudFoundryInfo,
+    CloudFoundryDeployment,
+    CloudfoundryOptions,
+} from "./lib/config/EnvironmentCloudFoundryTarget";
 export { HasCloudFoundryManifest } from "./lib/config/cloudFoundryManifestPushTest";
 export {
     CloudFoundryDeploy,
     CloudFoundryDeploymentStrategy,
-} from "./lib/goals/CloudFoundryPushDeploy";
+} from "./lib/goals/CloudFoundryDeploy";

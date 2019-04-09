@@ -19,8 +19,7 @@ import {
     predicatePushTest,
     PredicatePushTest,
 } from "@atomist/sdm";
-import { CloudFoundryManifestPath } from "../api/CloudFoundryTarget";
 
 export const HasCloudFoundryManifest: PredicatePushTest = predicatePushTest(
     "Has PCF manifest",
-    async p => projectUtils.fileExists(p, CloudFoundryManifestPath, f => true));
+    async p => projectUtils.fileExists(p, "manifest.yaml", f => true));

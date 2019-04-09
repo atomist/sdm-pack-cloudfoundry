@@ -19,23 +19,42 @@ import {
     logger,
 } from "@atomist/automation-client";
 import {
-    CloudFoundryInfo,
-    PivotalWebServices,
-} from "../api/CloudFoundryTarget";
+    Deployment,
+    TargetInfo,
+} from "@atomist/sdm";
+
+export interface CloudFoundryInfo extends TargetInfo {
+
+    api: string;
+    username: string;
+    password: string;
+    space: string;
+    org: string;
+    domain: string;
+
+}
+
+export interface CloudFoundryDeployment extends Deployment {
+
+    appName: string;
+
+}
 
 /**
  * Configure cloud foundry from environment variables.
  * See README for definition.
  */
-export class EnvironmentCloudFoundryTarget implements CloudFoundryInfo {
+export class EnvironmentCloudFoundryTarget {
 
-    public api: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").api || PivotalWebServices.api;
+    public api: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").api || "https://api.run.pivotal.io";
 
     public username: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").user;
 
     public password: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").password;
 
     public org: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").org;
+
+    public domain: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").domain;
 
     /**
      * Logical name for the space
@@ -72,5 +91,5 @@ export interface CloudfoundryOptions {
     spaces: {
         [key: string]: string;
     };
-
+    domain: string;
 }

@@ -87,7 +87,8 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
         await spawnLog(`cf`,
             ["curl", `/v3/apps?names=${id.repo}`],
             {log: stringLog});
-        const cfApp = JSON.parse(stringLog.log);
+        const json = stringLog.log.substring(stringLog.log.indexOf("{"));
+        const cfApp = JSON.parse(json);
         return cfApp.pagination.total_results > 0;
     }
 

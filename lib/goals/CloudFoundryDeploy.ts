@@ -97,31 +97,31 @@ export class CloudFoundryDeploy extends FulfillableGoalWithRegistrations<CloudFo
 }
 
 const CloudFoundryProgressTests: ProgressTest[] = [{
-    test: /---progress:deploying/i,
+    test: /Deploying to CloudFoundry/i,
     phase: "deploying",
 }, {
-    test: /---progress:startbluegreen/i,
+    test: /Starting blue-green deployment/i,
     phase: "starting blue-green",
 }, {
-    test: /---progress:greendeploying/i,
+    test: /Creating green deployment/i,
     phase: "deploying green",
 }, {
-    test: /---progress:mapgreentoblue]/i,
+    test: /Mapping green deployment to blue endpoint/i,
     phase: "mapping green -> blue",
 }, , {
-    test: /---progress:unmapbluetoblue]/i,
+    test: /Unmapping blue deployment to blue endpoint]/i,
     phase: "unmapping blue -> blue",
 }, {
-    test: /---progress:unmapgreentogreen]/i,
+    test: /Unmapping green deployment to green endpoint/i,
     phase: "unmaping green -> green",
 }, {
-    test: /---progress:deleteblue]/i,
+    test: /Deleting blue deployment/i,
     phase: "deleting blue",
 }, {
-    test: /---progress:renaminggreentoblue]/i,
+    test: /Renaming green deployment to blue]/i,
     phase: "renaming green -> blue",
 }, {
-    test: /---progress:complete]/i,
+    test: /Blue-green deployment complete/i,
     phase: "deployment complete",
 }];
 

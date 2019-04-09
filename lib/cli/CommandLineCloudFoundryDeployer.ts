@@ -37,7 +37,7 @@ async function deployToCloudFoundry(id: RemoteRepoRef,
                                     subDomain: string,
                                     deployableArtifactPath: string,
                                     log: ProgressLog): Promise<any> {
-    log.write("---progress:deploying\n");
+    log.write("Deploying to CloudFoundry\n");
     const cfArguments = [
         "push",
         id.repo,

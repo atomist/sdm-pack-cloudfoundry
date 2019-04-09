@@ -62,14 +62,14 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
         const subDomain = subDomainCreator(id);
         const previouslyDeployed = await this.hasBeenPreviouslyDeployed(id);
         if (previouslyDeployed) {
-            log.write("---progress:startbluegreen\n");
+            log.write("Starting blue-green deployment\n");
             await this.createGreenDeployment(id, project, subDomain, manifestFile, cfi, deployableArtifactPath, log);
             await this.mapGreenDeploymentToBlueEndpoint(id, cfi, subDomain, log);
             await this.unmapBlueDeploymentToBlueEndpoint(id, cfi, subDomain, log);
             await this.unmapGreenDeploymentToGreenEndpoint(id, cfi, subDomain, log);
             await this.deleteBlueDeployment(id, log);
             await this.renameGreenDeploymentToBlueDeployment(id, log);
-            log.write("---progress:complete\n");
+            log.write("Blue-green deployment complete\n");
         } else {
             await this.deployToCloudFoundry(id, project, manifestFile, cfi, subDomain, deployableArtifactPath, log);
         }
@@ -90,7 +90,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
     }
 
     private async renameGreenDeploymentToBlueDeployment(id: RemoteRepoRef, log: ProgressLog): Promise<any> {
-        log.write("---progress:renamegreentoblue\n");
+        log.write("Renaming green deployment to blue deployment\n");
         const cfArgumenteRenameGreenToBlue = [
             "rename",
             id.repo + "-green",
@@ -99,7 +99,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
     }
 
     private async deleteBlueDeployment(id: RemoteRepoRef, log: ProgressLog): Promise<any> {
-        log.write("---progress:deleteblue\n");
+        log.write("Deleting blue deployment\n");
         const cfArgumentsDeleteBlue = [
             "delete",
             "-f",
@@ -111,7 +111,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
                                                       cfi: CloudFoundryInfo,
                                                       subDomain: string,
                                                       log: ProgressLog): Promise<any> {
-        log.write("---progress:unmapgreentogreen\n");
+        log.write("Unmapping green deployment to green endpoint\n");
         const cfArgumentsRemoveGreenTempRoute = [
             "unmap-route",
             id.repo + "-green",
@@ -125,7 +125,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
                                                     cfi: CloudFoundryInfo,
                                                     subDomain: string,
                                                     log: ProgressLog): Promise<any> {
-        log.write("---progress:unmapbluetoblue\n");
+        log.write("Unmapping blue deployment to blue endpoint\n");
         const cfArgumentsUnmapBlue = [
             "unmap-route",
             id.repo,
@@ -139,7 +139,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
                                                    cfi: CloudFoundryInfo,
                                                    subDomain: string,
                                                    log: ProgressLog): Promise<any> {
-        log.write("---progress:mapgreentoblue\n");
+        log.write("Mapping green deployment to blue endpoint\n");
         const cfArgumentsMapGreen = [
             "map-route",
             id.repo + "-green",
@@ -156,7 +156,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
                                         cfi: CloudFoundryInfo,
                                         deployableArtifactPath: string,
                                         log: ProgressLog): Promise<any> {
-        log.write("---progress:greendeploying\n");
+        log.write("Creating green deployment\n");
         const cfArgumentsGreen = [
             "push",
             id.repo + "-green",
@@ -181,7 +181,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
                                        subDomain: string,
                                        deployableArtifactPath: string,
                                        log: ProgressLog): Promise<any> {
-        log.write("---progress:deploying\n");
+        log.write("Deploying to CloudFoundry\n");
         const cfArguments = [
             "push",
             id.repo,

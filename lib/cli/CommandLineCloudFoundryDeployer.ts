@@ -21,7 +21,6 @@ import {
     RemoteRepoRef,
 } from "@atomist/automation-client";
 import {
-    DelimitedWriteProgressLogDecorator,
     ProgressLog,
     spawnLog,
 } from "@atomist/sdm";
@@ -30,6 +29,30 @@ import {
     CloudFoundryDeployment,
     CloudFoundryInfo,
 } from "../config/EnvironmentCloudFoundryTarget";
+
+async function deployToCloudFoundry(id: RemoteRepoRef,
+                                    project: LocalProject,
+                                    manifestFile: string,
+                                    cfi: CloudFoundryInfo,
+                                    subDomain: string,
+                                    deployableArtifactPath: string,
+                                    log: ProgressLog): Promise<any> {
+    const cfArguments = [
+        "push",
+        id.repo,
+        "-f",
+        project.baseDir + "/" + manifestFile,
+        "-d",
+        cfi.domain,
+        "-n",
+        subDomain]
+        .concat(
+            !!deployableArtifactPath ?
+                ["-p",
+                    deployableArtifactPath] :
+                []);
+    await spawnLog("cf", cfArguments, {log});
+}
 
 /**
  * Spawn a new process to use the Cloud Foundry CLI to push.
@@ -48,7 +71,7 @@ export class CommandLineCloudFoundryDeployer implements CloudFoundryDeployer {
         // We need the Cloud Foundry manifest. If it's not found, we can't deploy
         // We want a fresh version unless we need it build
 
-        const manifestFile = await project.findFile("manifest.yaml");
+        const manifestFile = (await project.findFile("manifest.yaml")).path;
 
         if (!cfi.api || !cfi.org || !cfi.username || !cfi.password) {
             throw new Error("Cloud foundry authentication information missing. See CloudFoundryTarget.ts");
@@ -65,33 +88,10 @@ export class CommandLineCloudFoundryDeployer implements CloudFoundryDeployer {
             ["config", "--color", "false"],
             {cwd: project.baseDir, log});
         const subDomain = subDomainCreator(id);
-        const cfArguments =  [
-            "push",
-            id.repo,
-            "-f",
-            project.baseDir + "/" + manifestFile.path,
-            "-d",
-            cfi.domain,
-            "-n",
-            subDomain]
-            .concat(
-                !!deployableArtifactPath ?
-                    ["-p",
-                        deployableArtifactPath] :
-                    []);
-
-        const newLineDelimitedLog = new DelimitedWriteProgressLogDecorator(log, "\n");
-        const childProcess = spawnLog("cf", cfArguments, {log: newLineDelimitedLog});
-        return [await new Promise<CloudFoundryDeployment>((resolve, reject) => {
-            childProcess.then(result => {
-                if (result.code !== 0) {
-                    reject(`Error: code ${result.code}`);
-                }
-                resolve({
-                    endpoint: `${subDomain}.${cfi.domain}`,
-                    appName: id.repo,
-                });
-            }).catch(reject);
-        })];
+        await deployToCloudFoundry(id, project, manifestFile, cfi, subDomain, deployableArtifactPath, log);
+        return [{
+            endpoint: `${subDomain}.${cfi.domain}`,
+            appName: id.repo,
+        }];
     }
 }

@@ -21,9 +21,9 @@ import {
     RemoteRepoRef,
 } from "@atomist/automation-client";
 import {
-    DelimitedWriteProgressLogDecorator,
     ProgressLog,
     spawnLog,
+    StringCapturingProgressLog,
 } from "@atomist/sdm";
 import { CloudFoundryDeployer } from "../CloudFoundryDeployer";
 import {
@@ -64,18 +64,31 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
         await spawnLog(`cf`,
             ["config", "--color", "false"],
             {cwd: project.baseDir, log});
-        const newLineDelimitedLog = new DelimitedWriteProgressLogDecorator(log, "\n");
         const subDomain = subDomainCreator(id);
-        await this.createGreenDeployment(id, project, subDomain, manifestFile, cfi, deployableArtifactPath, newLineDelimitedLog);
-        await this.mapGreenDeploymentToBlueEndpoint(id, cfi, subDomain, newLineDelimitedLog);
-        await this.unmapBlueDeploymentToBlueEndpoint(id, cfi, subDomain, newLineDelimitedLog);
-        await this.unmapGreenDeploymentToGreenEndpoint(id, cfi, subDomain, newLineDelimitedLog);
-        await this.deleteBlueDeployment(id, newLineDelimitedLog);
-        await this.renameGreenDeploymentToBlueDeployment(id, newLineDelimitedLog);
+        const previouslyDeployed = await this.hasBeenPreviouslyDeployed(id);
+        if (previouslyDeployed) {
+            await this.createGreenDeployment(id, project, subDomain, manifestFile, cfi, deployableArtifactPath, log);
+            await this.mapGreenDeploymentToBlueEndpoint(id, cfi, subDomain, log);
+            await this.unmapBlueDeploymentToBlueEndpoint(id, cfi, subDomain, log);
+            await this.unmapGreenDeploymentToGreenEndpoint(id, cfi, subDomain, log);
+            await this.deleteBlueDeployment(id, log);
+            await this.renameGreenDeploymentToBlueDeployment(id, log);
+        } else {
+            await this.deployToCloudFoundry(id, project, manifestFile, cfi, subDomain, deployableArtifactPath, log);
+        }
         return [{
             endpoint: `${subDomain}.${cfi.domain}`,
             appName: id.repo,
         }];
+    }
+
+    private async hasBeenPreviouslyDeployed(id: RemoteRepoRef): Promise<boolean> {
+        const stringLog = new StringCapturingProgressLog();
+        await spawnLog(`cf`,
+            ["curl", `/v3/apps?names:${id.repo}`],
+            {log: stringLog});
+        const cfApp = JSON.parse(stringLog.log);
+        return cfApp.pagination.total_results > 0;
     }
 
     private async renameGreenDeploymentToBlueDeployment(id: RemoteRepoRef, newLineDelimitedLog: ProgressLog): Promise<any> {
@@ -155,5 +168,29 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
                         deployableArtifactPath] :
                     []);
         await spawnLog("cf", cfArgumentsGreen, {log: newLineDelimitedLog});
+    }
+
+    private async deployToCloudFoundry(id: RemoteRepoRef,
+                                       project: LocalProject,
+                                       manifestFile: string,
+                                       cfi: CloudFoundryInfo,
+                                       subDomain: string,
+                                       deployableArtifactPath: string,
+                                       log: ProgressLog): Promise<any> {
+        const cfArguments = [
+            "push",
+            id.repo,
+            "-f",
+            project.baseDir + "/" + manifestFile,
+            "-d",
+            cfi.domain,
+            "-n",
+            subDomain]
+            .concat(
+                !!deployableArtifactPath ?
+                    ["-p",
+                        deployableArtifactPath] :
+                    []);
+        await spawnLog("cf", cfArguments, {log});
     }
 }

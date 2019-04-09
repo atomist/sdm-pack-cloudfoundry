@@ -80,7 +80,7 @@ export class CommandLineCloudFoundryDeployer implements CloudFoundryDeployer {
         // Note: if the password is wrong, things hangs forever waiting for input.
         await spawnLog(
             "cf",
-            ["login", `-a`, `${cfi.api}`, `-o`, `${cfi.org}`, `-u`, `${cfi.username}`, `-p`,  `'${cfi.password}'`, `-s`, `${cfi.space}`],
+            ["login", `-a`, `${cfi.api}`, `-o`, `${cfi.org}`, `-u`, `${cfi.username}`, `-p`,  `${cfi.password}`, `-s`, `${cfi.space}`],
             {cwd: project.baseDir, log});
         logger.debug("Successfully selected space [%s]", cfi.space);
         // Turn off color so we don't have unpleasant escape codes in stream

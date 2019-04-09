@@ -21,12 +21,6 @@ import {
     PushImpact,
     ReviewListenerRegistration,
 } from "@atomist/sdm";
-import { AddCloudFoundryManifest } from "./handlers/addCloudFoundryManifest";
-import { enableDeployOnCloudFoundryManifestAddition } from "./listeners/enableDeployOnCloudFoundryManifestAddition";
-import {
-    SuggestAddingCloudFoundryManifest,
-    suggestAddingCloudFoundryManifestOnNewRepo,
-} from "./listeners/suggestAddingCloudFoundryManifest";
 
 export interface CloudFoundrySupportOptions {
 
@@ -59,24 +53,25 @@ export function CloudFoundrySupport(options: CloudFoundrySupportOptions): Extens
             "sdm.cloudfoundry.spaces.production",
             "sdm.cloudfoundry.spaces.staging",
         ],
-        configure: sdm => {
-            sdm
-                .addCodeTransformCommand(AddCloudFoundryManifest)
-                .addChannelLinkListener(SuggestAddingCloudFoundryManifest)
-                .addFirstPushListener(
-                    suggestAddingCloudFoundryManifestOnNewRepo(sdm.configuration.sdm.projectLoader));
-
-            if (!!options.inspectGoal) {
-                if (options.reviewListeners) {
-                    const listeners = Array.isArray(options.reviewListeners) ?
-                        options.reviewListeners : [options.reviewListeners];
-                    listeners.forEach(l => options.inspectGoal.withListener(l));
-                }
-            }
-            if (!!options.pushImpactGoal) {
-                options.pushImpactGoal
-                    .with(enableDeployOnCloudFoundryManifestAddition(sdm));
-            }
-        },
+        configure: () => {  return; },
+        // configure: sdm => {
+        //     sdm
+        //         .addCodeTransformCommand(AddCloudFoundryManifest)
+        //         .addChannelLinkListener(SuggestAddingCloudFoundryManifest)
+        //         .addFirstPushListener(
+        //             suggestAddingCloudFoundryManifestOnNewRepo(sdm.configuration.sdm.projectLoader));
+        //
+        //     if (!!options.inspectGoal) {
+        //         if (options.reviewListeners) {
+        //             const listeners = Array.isArray(options.reviewListeners) ?
+        //                 options.reviewListeners : [options.reviewListeners];
+        //             listeners.forEach(l => options.inspectGoal.withListener(l));
+        //         }
+        //     }
+        //     if (!!options.pushImpactGoal) {
+        //         options.pushImpactGoal
+        //             .with(enableDeployOnCloudFoundryManifestAddition(sdm));
+        //     }
+        // },
     };
 }

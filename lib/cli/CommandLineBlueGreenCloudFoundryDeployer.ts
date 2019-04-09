@@ -89,6 +89,7 @@ export class CommandLineBlueGreenCloudFoundryDeployer implements CloudFoundryDep
     private async deleteBlueDeployment(id: RemoteRepoRef, newLineDelimitedLog: ProgressLog): Promise<any> {
         const cfArgumentsDeleteBlue = [
             "delete",
+            "-f",
             id.repo];
         await spawnLog("cf", cfArgumentsDeleteBlue, {log: newLineDelimitedLog});
     }

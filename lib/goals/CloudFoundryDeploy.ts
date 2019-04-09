@@ -118,7 +118,7 @@ const CloudFoundryProgressTests: ProgressTest[] = [{
     test: /Deleting blue deployment/i,
     phase: "deleting blue",
 }, {
-    test: /Renaming green deployment to blue]/i,
+    test: /Renaming green deployment to blue/i,
     phase: "renaming green -> blue",
 }, {
     test: /Blue-green deployment complete/i,

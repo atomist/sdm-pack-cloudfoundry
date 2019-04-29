@@ -7,6 +7,10 @@ and this project adheres to [Semantic Versioning](http://semver.org/).
 
 ## [Unreleased](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.3...HEAD)
 
+### Changed
+
+-   Remove usage of cf-client library and use REST API directly. [#18](https://github.com/atomist/sdm-pack-cloudfoundry/issues/18)
+
 ## [1.0.3](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.2...1.0.3) - 2019-03-20
 
 ## [1.0.2](https://github.com/atomist/sdm-pack-cloudfoundry/compare/1.0.1...1.0.2) - 2018-12-10

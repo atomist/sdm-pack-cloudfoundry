@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -18,10 +18,23 @@ import {
     configurationValue,
     logger,
 } from "@atomist/automation-client";
-import {
-    CloudFoundryInfo,
-    PivotalWebServices,
-} from "../api/CloudFoundryTarget";
+
+export interface CloudFoundryInfo {
+    description: string;
+    api: string;
+    username: string;
+    password: string;
+    space: string;
+    org: string;
+    domain: string;
+
+}
+
+export interface CloudFoundryDeployment {
+    endpoint: string;
+    appName: string;
+
+}
 
 /**
  * Configure cloud foundry from environment variables.
@@ -29,13 +42,15 @@ import {
  */
 export class EnvironmentCloudFoundryTarget implements CloudFoundryInfo {
 
-    public api: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").api || PivotalWebServices.api;
+    public api: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").api || "https://api.run.pivotal.io";
 
     public username: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").user;
 
     public password: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").password;
 
     public org: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").org;
+
+    public domain: string = configurationValue<CloudfoundryOptions>("sdm.cloudfoundry").domain;
 
     /**
      * Logical name for the space
@@ -72,5 +87,5 @@ export interface CloudfoundryOptions {
     spaces: {
         [key: string]: string;
     };
-
+    domain: string;
 }

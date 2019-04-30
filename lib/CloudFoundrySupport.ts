@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -15,40 +15,12 @@
  */
 
 import {
-    AutoCodeInspection,
     ExtensionPack,
     metadata,
-    PushImpact,
-    ReviewListenerRegistration,
 } from "@atomist/sdm";
 import { AddCloudFoundryManifest } from "./handlers/addCloudFoundryManifest";
-import { enableDeployOnCloudFoundryManifestAddition } from "./listeners/enableDeployOnCloudFoundryManifestAddition";
-import {
-    SuggestAddingCloudFoundryManifest,
-    suggestAddingCloudFoundryManifestOnNewRepo,
-} from "./listeners/suggestAddingCloudFoundryManifest";
 
-export interface CloudFoundrySupportOptions {
-
-    /**
-     * Inspect goal to add inspections to.
-     * Review functionality won't work otherwise.
-     */
-    inspectGoal?: AutoCodeInspection;
-
-    /**
-     * Autofix goal to add autofixes to.
-     * Autofix functionality won't work otherwise.
-     */
-    pushImpactGoal?: PushImpact;
-
-    /**
-     * Review listeners that let you publish review results.
-     */
-    reviewListeners?: ReviewListenerRegistration | ReviewListenerRegistration[];
-}
-
-export function CloudFoundrySupport(options: CloudFoundrySupportOptions): ExtensionPack {
+export function cloudFoundrySupport(): ExtensionPack {
 
     return {
         ...metadata("cloud-foundry"),
@@ -61,22 +33,7 @@ export function CloudFoundrySupport(options: CloudFoundrySupportOptions): Extens
         ],
         configure: sdm => {
             sdm
-                .addCodeTransformCommand(AddCloudFoundryManifest)
-                .addChannelLinkListener(SuggestAddingCloudFoundryManifest)
-                .addFirstPushListener(
-                    suggestAddingCloudFoundryManifestOnNewRepo(sdm.configuration.sdm.projectLoader));
-
-            if (!!options.inspectGoal) {
-                if (options.reviewListeners) {
-                    const listeners = Array.isArray(options.reviewListeners) ?
-                        options.reviewListeners : [options.reviewListeners];
-                    listeners.forEach(l => options.inspectGoal.withListener(l));
-                }
-            }
-            if (!!options.pushImpactGoal) {
-                options.pushImpactGoal
-                    .with(enableDeployOnCloudFoundryManifestAddition(sdm));
-            }
+                .addCodeTransformCommand(AddCloudFoundryManifest);
         },
     };
 }

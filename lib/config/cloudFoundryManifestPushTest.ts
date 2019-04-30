@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -19,8 +19,7 @@ import {
     predicatePushTest,
     PredicatePushTest,
 } from "@atomist/sdm";
-import { CloudFoundryManifestPath } from "../api/CloudFoundryTarget";
 
 export const HasCloudFoundryManifest: PredicatePushTest = predicatePushTest(
     "Has PCF manifest",
-    async p => projectUtils.fileExists(p, CloudFoundryManifestPath, f => true));
+    async p => projectUtils.fileExists(p, "manifest.yaml", f => true));

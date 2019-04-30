@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,14 +14,18 @@
  * limitations under the License.
  */
 
-export { CloudFoundrySupport } from "./lib/CloudFoundrySupport";
-export { CloudFoundryBlueGreenDeployer } from "./lib/push/CloudFoundryBlueGreenDeployer";
-export { CloudFoundryPushDeployer } from "./lib/push/CloudFoundryPushDeployer";
+export { cloudFoundrySupport } from "./lib/CloudFoundrySupport";
 export { CommandLineCloudFoundryDeployer } from "./lib/cli/CommandLineCloudFoundryDeployer";
-export { CloudFoundryInfo } from "./lib/api/CloudFoundryTarget";
-export { EnvironmentCloudFoundryTarget } from "./lib/config/EnvironmentCloudFoundryTarget";
+export { CommandLineBlueGreenCloudFoundryDeployer } from "./lib/cli/CommandLineBlueGreenCloudFoundryDeployer";
+export {
+    EnvironmentCloudFoundryTarget,
+    CloudFoundryInfo,
+    CloudFoundryDeployment,
+    CloudfoundryOptions,
+} from "./lib/config/EnvironmentCloudFoundryTarget";
 export { HasCloudFoundryManifest } from "./lib/config/cloudFoundryManifestPushTest";
 export {
     CloudFoundryDeploy,
     CloudFoundryDeploymentStrategy,
-} from "./lib/goals/CloudFoundryPushDeploy";
+} from "./lib/goals/CloudFoundryDeploy";
+export { AddCloudFoundryManifest } from "./lib/handlers/addCloudFoundryManifest";

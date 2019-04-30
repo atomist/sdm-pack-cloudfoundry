@@ -1,5 +1,5 @@
 /*
- * Copyright © 2018 Atomist, Inc.
+ * Copyright © 2019 Atomist, Inc.
  *
  * Licensed under the Apache License, Version 2.0 (the "License");
  * you may not use this file except in compliance with the License.
@@ -14,25 +14,10 @@
  * limitations under the License.
  */
 
-export interface Manifest {
-    applications: ManifestApplication[];
-}
+import * as assert from "assert";
 
-export interface ManifestApplication {
-    name: string;
-    memory?: string;
-    instances?: number;
-    buildpack?: string;
-    command?: string;
-    disk_quota?: string;
-    "health-check-type"?: string;
-    "health-check-http-endpoint"?: string;
-    "no-route"?: boolean;
-    "random-route"?: boolean;
-    path: string;
-    stack: string;
-    timeout: number;
-    env: object;
-    services: string[];
-    routes: string[];
-}
+describe("empty", () => {
+    it("tests nothing", () => {
+        assert.strictEqual(true, true);
+    });
+});

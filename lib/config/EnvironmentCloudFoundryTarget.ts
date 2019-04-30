@@ -18,13 +18,9 @@ import {
     configurationValue,
     logger,
 } from "@atomist/automation-client";
-import {
-    Deployment,
-    TargetInfo,
-} from "@atomist/sdm";
 
-export interface CloudFoundryInfo extends TargetInfo {
-
+export interface CloudFoundryInfo {
+    description: string;
     api: string;
     username: string;
     password: string;
@@ -34,8 +30,8 @@ export interface CloudFoundryInfo extends TargetInfo {
 
 }
 
-export interface CloudFoundryDeployment extends Deployment {
-
+export interface CloudFoundryDeployment {
+    endpoint: string;
     appName: string;
 
 }

@@ -29,7 +29,7 @@
   "types": "./index.d.ts",
   "dependencies": {
     "@atomist/microgrammar": "^1.2.0",
-    "@atomist/slack-messages": "^1.1.0",
+    "@atomist/slack-messages": "^1.1.1",
     "@types/lodash": "^4.14.116",
     "js-yaml": "^3.12.0",
     "lodash": "^4.17.10"
@@ -41,10 +41,10 @@
     "@atomist/sdm-pack-build": ">=1.0.4"
   },
   "devDependencies": {
-    "@atomist/automation-client": "^1.3.1-master.20190405174432",
-    "@atomist/sdm": "^1.4.2-master.20190405122526",
-    "@atomist/sdm-core": "^1.5.0-master.20190406072016",
-    "@atomist/sdm-pack-build": "^1.0.4-master.20190320190156",
+    "@atomist/automation-client": "^1.6.0",
+    "@atomist/sdm": "^1.5.1",
+    "@atomist/sdm-core": "^1.5.2",
+    "@atomist/sdm-pack-build": "^1.0.4",
     "@types/mocha": "^5.2.5",
     "@types/node": "^10.5.7",
     "@types/power-assert": "^1.5.0",
